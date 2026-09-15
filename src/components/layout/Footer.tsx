@@ -10,15 +10,15 @@ export function Footer() {
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white">
-                <Shield className="w-6 h-6" />
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-600 to-brand-600 flex items-center justify-center text-white shadow-md shadow-orange-500/20">
+                <Shield className="w-5 h-5 fill-white/20" />
               </div>
-              <span className="text-xl font-bold text-white tracking-wide">
-                FinAdvisor TH
+              <span className="text-xl font-black text-white tracking-tight">
+                Modtanoy<span className="text-amber-400">Advisor</span>
               </span>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed pr-6">
-              แพลตฟอร์มตัวกลางอิสระในการให้ความรู้ เปรียบเทียบแผนประกันชีวิต สุขภาพ เกษียณอายุ และวางแผนภาษี พร้อมเชื่อมโยงผู้รับคำปรึกษากับตัวแทนและที่ปรึกษาการเงินที่มีใบอนุญาตถูกต้องตามกฎหมาย
+            <p className="text-xs text-slate-400 leading-relaxed pr-6">
+              มดตะนอย แอดไวเซอร์ (ModtanoyAdvisor) แพลตฟอร์มตัวกลางอิสระในการให้ความรู้ เปรียบเทียบแผนประกันชีวิต สุขภาพ เกษียณอายุ และวางแผนภาษี &ldquo;ตัวเล็กแต่ปกป้องคุณยิ่งใหญ่&rdquo; พร้อมเชื่อมโยงที่ปรึกษาการเงินที่มีใบอนุญาต คปภ. ถูกต้องตามกฎหมาย
             </p>
             <div className="flex items-center gap-4 text-xs text-slate-400 pt-2">
               <span className="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
@@ -132,7 +132,7 @@ export function Footer() {
           </p>
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500 pt-2">
             <div>
-              © {new Date().getFullYear()} FinAdvisor TH. สงวนลิขสิทธิ์ทุกประการ.
+              © {new Date().getFullYear()} ModtanoyAdvisor. สงวนลิขสิทธิ์ทุกประการ.
             </div>
             <div className="text-xs text-slate-500">
               Verified Partner with Licensed Financial Consultants

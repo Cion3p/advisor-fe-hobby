@@ -383,3 +383,67 @@ export async function fetchAdminStatsAPI() {
   }
 }
 
+export async function createProductAPI(data: any) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to create product');
+    return await res.json();
+  } catch {
+    // Return mock success for local demo
+    const newId = FALLBACK_PRODUCTS.length + 1;
+    const mockProduct = {
+      id: newId,
+      ...data,
+      is_featured: data.isFeatured || false,
+      is_tax_deductible: data.isTaxDeductible || false,
+      min_premium: data.minPremium,
+      min_entry_age: data.minEntryAge || 0,
+      max_entry_age: data.maxEntryAge || 70,
+      company_name: 'บมจ. พันธมิตรประกันชีวิต',
+      category_name: 'แผนประกันใหม่',
+      rating: 5.0,
+    };
+    FALLBACK_PRODUCTS.unshift(mockProduct);
+    return { success: true, data: mockProduct };
+  }
+}
+
+export async function updateProductAPI(id: number, data: any) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update product');
+    return await res.json();
+  } catch {
+    const idx = FALLBACK_PRODUCTS.findIndex((p) => p.id === id);
+    if (idx !== -1) {
+      FALLBACK_PRODUCTS[idx] = { ...FALLBACK_PRODUCTS[idx], ...data };
+    }
+    return { success: true, id };
+  }
+}
+
+export async function deleteProductAPI(id: number) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/products/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete product');
+    return await res.json();
+  } catch {
+    const idx = FALLBACK_PRODUCTS.findIndex((p) => p.id === id);
+    if (idx !== -1) {
+      FALLBACK_PRODUCTS.splice(idx, 1);
+    }
+    return { success: true, id };
+  }
+}
+
+

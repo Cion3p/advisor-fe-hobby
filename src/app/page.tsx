@@ -28,23 +28,23 @@ export default async function HomePage() {
   return (
     <div className="space-y-20 pb-20">
       {/* 1. Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-white to-slate-50 pt-16 pb-24 border-b border-slate-200/60">
+      <section className="relative overflow-hidden bg-gradient-to-b from-orange-50/40 via-white to-slate-50/80 pt-16 pb-24 border-b border-slate-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-6">
-            <div className="inline-flex items-center gap-2 bg-brand-100/80 border border-brand-200 text-brand-800 text-xs font-semibold px-4 py-1.5 rounded-full shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-brand-600" />
-              แพลตฟอร์มเปรียบเทียบประกันและวางแผนการเงินอันดับ 1
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-orange-200/70 text-orange-900 text-xs font-bold px-4 py-1.5 rounded-full shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+              ModtanoyAdvisor • ตัวเล็กแต่ช่วยคุณวางแผนยิ่งใหญ่
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              เลือกแผนประกันที่ใช่ <br />
-              <span className="bg-gradient-to-r from-brand-600 to-wealth-600 bg-clip-text text-transparent">
-                คุ้มครองครบ วางแผนภาษีคุ้มค่า
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+              เลือกประกันที่ตรงใจ <br />
+              <span className="bg-gradient-to-r from-orange-600 via-amber-600 to-brand-600 bg-clip-text text-transparent">
+                วางแผนภาษี คุ้มครองคุ้มค่าทุกบาท
               </span>
             </h1>
 
-            <p className="text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-              เปรียบเทียบตารางผลประโยชน์ประกันสุขภาพเหมาจ่าย ประกันชีวิต และบำนาญจากทุกบริษัทชั้นนำ พร้อมเครื่องคำนวณภาษี 2567 และปรึกษาผู้เชี่ยวชาญ คปภ. ฟรี
+            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
+              มดตะนอย แอดไวเซอร์ รวบรวมและเปรียบเทียบตารางผลประโยชน์ประกันสุขภาพเหมาจ่าย ประกันชีวิต และบำนาญจากทุกบริษัทชั้นนำ พร้อมระบบคำนวณภาษีอัจฉริยะ ปรึกษาผู้เชี่ยวชาญ คปภ. ฟรี
             </p>
 
             {/* Action Buttons */}
