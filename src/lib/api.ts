@@ -500,6 +500,37 @@ export async function submitLeadAPI(data: any) {
   return json.data;
 }
 
+export async function createLeadAPI(data: any) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/leads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || 'บันทึกข้อมูลไม่สำเร็จ');
+    return json.data;
+  } catch (err) {
+    const newLead = {
+      id: Date.now(),
+      customer_name: data.customerName,
+      customer_phone: data.customerPhone,
+      customer_email: data.customerEmail || '',
+      product_title: data.productTitle || 'ขอคำปรึกษาภาพรวม',
+      preferred_contact_time: data.preferredContactTime || 'สะดวกทุกเวลา',
+      province: data.province || 'กรุงเทพมหานคร',
+      budget_range: data.budgetRange || '20,000 - 40,000 บาท/ปี',
+      user_notes: data.userNotes || '',
+      tags: Array.isArray(data.tags) ? data.tags : data.tags ? [data.tags] : [],
+      status: data.status || 'NEW',
+      created_at: new Date().toISOString(),
+      pdpa_consent: true,
+    };
+    (FALLBACK_LEADS as any[]).unshift(newLead);
+    return newLead;
+  }
+}
+
 export const FALLBACK_LEADS = [
   {
     id: 1,
@@ -511,6 +542,7 @@ export const FALLBACK_LEADS = [
     province: 'กรุงเทพมหานคร',
     budget_range: '20,000 - 40,000 บาท/ปี',
     user_notes: 'ต้องการเปรียบเทียบค่าห้องเดี่ยวมาตรฐานของโรงพยาบาลในเครือ BDMS',
+    tags: ['VIP ลูกค้าสำคัญ', 'สุขภาพเหมาจ่าย'],
     status: 'NEW',
     created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
     pdpa_consent: true,
@@ -525,6 +557,7 @@ export const FALLBACK_LEADS = [
     province: 'เชียงใหม่',
     budget_range: '70,000 - 100,000 บาท/ปี',
     user_notes: 'สนใจลดหย่อนภาษี 100,000 บาทแรก ออมสั้น 5 ปี มีเงินคืนทุกปี',
+    tags: ['ลดหย่อนภาษี 100,000', 'ออมสั้น 5 ปี'],
     status: 'CONTACTED',
     created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
     pdpa_consent: true,
@@ -539,6 +572,7 @@ export const FALLBACK_LEADS = [
     province: 'นนทบุรี',
     budget_range: '40,000 - 70,000 บาท/ปี',
     user_notes: 'วางแผนเกษียณอายุ 55 ปี ต้องการทราบเงินบำนาญต่อปี',
+    tags: ['บำนาญเกษียณ', 'นัดคุยเสาร์นี้'],
     status: 'CONSULTING',
     created_at: new Date(Date.now() - 3600000 * 48).toISOString(),
     pdpa_consent: true,
@@ -557,17 +591,23 @@ export async function fetchLeadsAPI(status?: string) {
   }
 }
 
-export async function updateLeadStatusAPI(id: number, status: string, notes?: string) {
+export async function updateLeadStatusAPI(id: number, status: string, notes?: string, tags?: string[]) {
   try {
     const res = await fetch(`${API_BASE_URL}/leads/${id}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status, notes }),
+      body: JSON.stringify({ status, notes, tags }),
     });
     if (!res.ok) throw new Error('Failed to update status');
     return await res.json();
   } catch {
-    return { success: true, leadId: id, status };
+    const item = (FALLBACK_LEADS as any[]).find((l) => l.id === id);
+    if (item) {
+      item.status = status;
+      if (notes !== undefined) item.user_notes = notes;
+      if (tags !== undefined) item.tags = tags;
+    }
+    return { success: true, leadId: id, status, tags };
   }
 }
 

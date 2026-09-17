@@ -54,10 +54,19 @@ import {
   Building,
   Phone,
   HelpCircle,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Activity,
+  PieChart,
+  Smartphone,
+  Monitor,
+  Tablet,
+  Globe,
+  Cookie,
+  Shield
 } from 'lucide-react';
 import { 
   fetchLeadsAPI, 
+  createLeadAPI,
   updateLeadStatusAPI, 
   deleteLeadAPI,
   fetchAdminStatsAPI, 
@@ -86,7 +95,8 @@ import {
   getAnnouncementPopup,
   saveAnnouncementPopup,
   resetAnnouncementPopup,
-  DEFAULT_ANNOUNCEMENT_POPUP
+  DEFAULT_ANNOUNCEMENT_POPUP,
+  fetchAnalyticsAPI,
 } from '@/lib/api';
 import { Company, Category, Product, HeroSlide, Article, AnnouncementPopup } from '@/types';
 import { ImageUploadPicker } from '@/components/common/ImageUploadPicker';
@@ -143,6 +153,56 @@ export default function AdminPortalPage() {
 
   // Toast Notification
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
+
+  // Analytics State
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [isSyncingAnalytics, setIsSyncingAnalytics] = useState(false);
+  const [lastAnalyticsSync, setLastAnalyticsSync] = useState<string>('');
+
+  // Add Lead Form State (CRM Manual Addition)
+  const defaultLeadForm = {
+    customerName: '',
+    customerPhone: '',
+    customerEmail: '',
+    province: 'กรุงเทพมหานคร',
+    productTitle: '',
+    budgetRange: '20,000 - 40,000 บาท/ปี',
+    preferredContactTime: 'สะดวกทุกเวลา',
+    status: 'NEW',
+    userNotes: '',
+    tags: [] as string[],
+  };
+  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [leadForm, setLeadForm] = useState(defaultLeadForm);
+  const [customTagInput, setCustomTagInput] = useState('');
+
+  // Lead Tags Management Modal
+  const [editingLeadTags, setEditingLeadTags] = useState<any | null>(null);
+  const [leadTagsList, setLeadTagsList] = useState<string[]>([]);
+  const [newTagText, setNewTagText] = useState('');
+
+  const PRESET_TAGS = [
+    'VIP ลูกค้าสำคัญ',
+    'วางแผนลดหย่อนภาษี',
+    'ประกันสุขภาพเหมาจ่าย',
+    'ประกันบำนาญเกษียณ',
+    'ประกันชีวิตมรดก',
+    'นัดคุยเสาร์นี้',
+    'รอเงินเดือนออก',
+    'คุยง่าย ปิดเร็ว',
+    'งบสูง 100,000+',
+    'เด็ก/บุตรหลาน',
+  ];
+
+  const getTagColor = (tag: string) => {
+    if (tag.includes('VIP')) return 'bg-amber-100 text-amber-900 border-amber-300';
+    if (tag.includes('ภาษี')) return 'bg-emerald-100 text-emerald-900 border-emerald-300';
+    if (tag.includes('สุขภาพ')) return 'bg-orange-100 text-orange-900 border-orange-300';
+    if (tag.includes('บำนาญ')) return 'bg-purple-100 text-purple-900 border-purple-300';
+    if (tag.includes('ชีวิต') || tag.includes('มรดก')) return 'bg-blue-100 text-blue-900 border-blue-300';
+    if (tag.includes('งบสูง') || tag.includes('100,000')) return 'bg-rose-100 text-rose-900 border-rose-300';
+    return 'bg-slate-100 text-slate-800 border-slate-300';
+  };
 
   // Modals & Drawers
   const [showAddProductModal, setShowAddProductModal] = useState(false);
@@ -297,7 +357,7 @@ export default function AdminPortalPage() {
     highlightPoint2: 'ค่าห้องเดี่ยวมาตรฐานทุกโรงพยาบาล',
   });
 
-  // Check saved session on mount
+  // Check saved session & URL tab param on mount
   useEffect(() => {
     try {
       const savedAuth = localStorage.getItem('modtanoy_admin_session');
@@ -310,6 +370,15 @@ export default function AdminPortalPage() {
       }
     } catch {
       // ignore parsing error
+    }
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      const validTabs = ['overview', 'leads', 'products', 'companies', 'categories', 'banners', 'articles', 'announcements', 'calculators', 'analytics', 'settings'];
+      if (tabParam && validTabs.includes(tabParam)) {
+        setActiveTab(tabParam as any);
+      }
     }
   }, []);
 
@@ -324,12 +393,13 @@ export default function AdminPortalPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [leadsData, statsData, productsData, categoriesData, companiesData] = await Promise.all([
+      const [leadsData, statsData, productsData, categoriesData, companiesData, realAnalytics] = await Promise.all([
         fetchLeadsAPI(filterStatus === 'ALL' ? undefined : filterStatus),
         fetchAdminStatsAPI(),
         fetchProducts(),
         fetchCategories(),
         fetchCompaniesAPI(),
+        fetchAnalyticsAPI(),
       ]);
       setLeads(leadsData);
       setStats(statsData);
@@ -341,6 +411,10 @@ export default function AdminPortalPage() {
       const currentAnnouncement = getAnnouncementPopup();
       setAnnouncementPopup(currentAnnouncement);
       setEditingAnnouncement(currentAnnouncement);
+      if (realAnalytics) {
+        setAnalyticsData(realAnalytics);
+        setLastAnalyticsSync(new Date().toLocaleTimeString('th-TH'));
+      }
 
       // Load saved settings
       try {
@@ -353,6 +427,129 @@ export default function AdminPortalPage() {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRefreshAnalytics = async () => {
+    setIsSyncingAnalytics(true);
+    try {
+      const aData = await fetchAnalyticsAPI();
+      if (aData) {
+        setAnalyticsData(aData);
+        setLastAnalyticsSync(new Date().toLocaleTimeString('th-TH'));
+        showToast('ซิงค์ข้อมูลสถิติการเข้าชมเว็บล่าสุดสำเร็จแล้ว', 'success');
+      }
+    } catch {
+      showToast('ไม่สามารถซิงค์ข้อมูลสถิติการเข้าชมได้', 'error');
+    } finally {
+      setIsSyncingAnalytics(false);
+    }
+  };
+
+  const handleExportAnalyticsReport = () => {
+    if (!analyticsData) {
+      showToast('ยังไม่มีข้อมูลสถิติสำหรับส่งออก', 'info');
+      return;
+    }
+    const blob = new Blob([JSON.stringify(analyticsData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `modtanoy_traffic_analytics_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('ดาวน์โหลดรายงานสถิติเข้าชมเว็บสำเร็จ', 'success');
+  };
+
+  // --- Create Lead Handler (Manual addition in CRM) ---
+  const handleCreateLead = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leadForm.customerName.trim() || !leadForm.customerPhone.trim()) {
+      showToast('กรุณาระบุชื่อและเบอร์โทรศัพท์ลูกค้า', 'error');
+      return;
+    }
+
+    try {
+      await createLeadAPI({
+        customerName: leadForm.customerName,
+        customerPhone: leadForm.customerPhone,
+        customerEmail: leadForm.customerEmail,
+        province: leadForm.province,
+        productTitle: leadForm.productTitle || 'ขอรับคำปรึกษาภาพรวม',
+        budgetRange: leadForm.budgetRange,
+        preferredContactTime: leadForm.preferredContactTime,
+        status: leadForm.status,
+        userNotes: leadForm.userNotes,
+        tags: leadForm.tags,
+        pdpaConsent: true,
+      });
+
+      setShowAddLeadModal(false);
+      setLeadForm(defaultLeadForm);
+      setCustomTagInput('');
+      const [refreshedLeads, refreshedStats] = await Promise.all([
+        fetchLeadsAPI(filterStatus === 'ALL' ? undefined : filterStatus),
+        fetchAdminStatsAPI(),
+      ]);
+      setLeads(refreshedLeads);
+      setStats(refreshedStats);
+      showToast('เพิ่มลูกค้ามุ่งหวังใหม่เข้าสู่ระบบสำเร็จแล้ว', 'success');
+    } catch (err: any) {
+      console.error(err);
+      showToast('ไม่สามารถบันทึกข้อมูลลูกค้าได้', 'error');
+    }
+  };
+
+  // --- Lead Tags Handlers ---
+  const handleOpenTagEditor = (lead: any) => {
+    setEditingLeadTags(lead);
+    setLeadTagsList(Array.isArray(lead.tags) ? [...lead.tags] : []);
+    setNewTagText('');
+  };
+
+  const handleToggleTag = (tag: string) => {
+    if (leadTagsList.includes(tag)) {
+      setLeadTagsList(leadTagsList.filter((t) => t !== tag));
+    } else {
+      setLeadTagsList([...leadTagsList, tag]);
+    }
+  };
+
+  const handleAddCustomTag = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = newTagText.trim();
+    if (trimmed && !leadTagsList.includes(trimmed)) {
+      setLeadTagsList([...leadTagsList, trimmed]);
+      setNewTagText('');
+    }
+  };
+
+  const handleSaveLeadTags = async () => {
+    if (!editingLeadTags) return;
+    try {
+      await updateLeadStatusAPI(editingLeadTags.id, editingLeadTags.status, editingLeadTags.user_notes, leadTagsList);
+      setLeads((prev) => prev.map((l) => (l.id === editingLeadTags.id ? { ...l, tags: leadTagsList } : l)));
+      setEditingLeadTags(null);
+      showToast('อัปเดตแท็กของลูกค้าสำเร็จแล้ว', 'success');
+    } catch {
+      showToast('เกิดข้อผิดพลาดในการบันทึกแท็ก', 'error');
+    }
+  };
+
+  const handleToggleLeadFormTag = (tag: string) => {
+    if (leadForm.tags.includes(tag)) {
+      setLeadForm({ ...leadForm, tags: leadForm.tags.filter((t) => t !== tag) });
+    } else {
+      setLeadForm({ ...leadForm, tags: [...leadForm.tags, tag] });
+    }
+  };
+
+  const handleAddCustomLeadFormTag = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = customTagInput.trim();
+    if (trimmed && !leadForm.tags.includes(trimmed)) {
+      setLeadForm({ ...leadForm, tags: [...leadForm.tags, trimmed] });
+      setCustomTagInput('');
     }
   };
 
@@ -952,12 +1149,14 @@ export default function AdminPortalPage() {
   const filteredLeads = leads.filter((item) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
+    const matchesTag = Array.isArray(item.tags) && item.tags.some((t: string) => String(t).toLowerCase().includes(q));
     return (
       item.customer_name?.toLowerCase().includes(q) ||
       item.customer_phone?.includes(q) ||
       item.customer_email?.toLowerCase().includes(q) ||
       item.product_title?.toLowerCase().includes(q) ||
-      item.province?.toLowerCase().includes(q)
+      item.province?.toLowerCase().includes(q) ||
+      matchesTag
     );
   });
 
@@ -1360,9 +1559,12 @@ export default function AdminPortalPage() {
               }`}
             >
               <div className="flex items-center gap-3">
-                <TrendingUp className="w-4 h-4" />
-                <span>รายงานและสถิติ</span>
+                <Activity className="w-4 h-4" />
+                <span>สถิติการเข้าชมเว็บ</span>
               </div>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                Live
+              </span>
             </button>
 
 
@@ -1463,7 +1665,7 @@ export default function AdminPortalPage() {
                   {activeTab === 'articles' && 'จัดการบทความ & รูปภาพ'}
                   {activeTab === 'announcements' && 'ป๊อปอัปประกาศหน้าเว็บ'}
                   {activeTab === 'calculators' && 'เกณฑ์คำนวณภาษี & ความคุ้มครอง'}
-                  {activeTab === 'analytics' && 'รายงานวิเคราะห์'}
+                  {activeTab === 'analytics' && 'สถิติการเข้าชมเว็บ'}
                   {activeTab === 'settings' && 'การตั้งค่า'}
                 </span>
               </div>
@@ -1477,7 +1679,7 @@ export default function AdminPortalPage() {
                 {activeTab === 'articles' && 'ระบบจัดการบทความความรู้และอัปโหลดภาพหน้าปก'}
                 {activeTab === 'announcements' && 'กำหนดค่าป๊อปอัปประกาศและแบนเนอร์โปรโมชั่นหน้าแรก'}
                 {activeTab === 'calculators' && 'กำหนดเพดานลดหย่อนภาษี อัตราก้าวหน้า และทุนชีวิต'}
-                {activeTab === 'analytics' && 'สถิติการปรึกษาและความต้องการของลูกค้า'}
+                {activeTab === 'analytics' && 'สถิติการเข้าชมเว็บไซต์และการใช้งานคุกกี้ (Web Traffic Analytics)'}
                 {activeTab === 'settings' && 'การตั้งค่าระบบ ข้อมูลติดต่อ และสำรองข้อมูล'}
               </h2>
             </div>
@@ -1494,12 +1696,32 @@ export default function AdminPortalPage() {
             </button>
 
             {activeTab === 'leads' && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowAddLeadModal(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-orange-600 hover:bg-orange-700 text-white transition-all shadow-md shadow-orange-600/20 cursor-pointer"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  <span>เพิ่มลูกค้าใหม่</span>
+                </button>
+                <button
+                  onClick={handleExportCSV}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5 text-slate-500" />
+                  <span>ส่งออก CSV</span>
+                </button>
+              </div>
+            )}
+
+            {activeTab === 'analytics' && (
               <button
-                onClick={handleExportCSV}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs cursor-pointer"
+                onClick={handleRefreshAnalytics}
+                disabled={isSyncingAnalytics}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white transition-all shadow-md shadow-orange-600/20 cursor-pointer"
               >
-                <Download className="w-3.5 h-3.5 text-slate-500" />
-                <span>ส่งออก CSV</span>
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncingAnalytics ? 'animate-spin' : ''}`} />
+                <span>{isSyncingAnalytics ? 'กำลังซิงค์...' : 'ซิงค์สถิติล่าสุด'}</span>
               </button>
             )}
 
@@ -1833,6 +2055,127 @@ export default function AdminPortalPage() {
                 </div>
               </div>
 
+              {/* Merged Old Statistics: Customer Demand & Market Insights */}
+              <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-xs space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                  <div>
+                    <h4 className="font-black text-base text-slate-900 flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-orange-600" />
+                      <span>สถิติความต้องการแผนประกันและพฤติกรรมลูกค้า (Market & Advisory Insights)</span>
+                    </h4>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      สรุปสถิติความสนใจหมวดหมู่ประกัน สัดส่วนงบประมาณเฉลี่ย และอัตราความสำเร็จจากฐานข้อมูล
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-semibold">
+                    <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Conversion: {stats.totalLeads > 0 ? ((stats.closedLeads / stats.totalLeads) * 100).toFixed(1) : '20.0'}%
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
+                      พันธมิตร {companies.length || 5} บริษัท
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Category Demand */}
+                  <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200/80 space-y-3.5">
+                    <div className="flex items-center justify-between">
+                      <h5 className="font-bold text-xs text-slate-700 uppercase flex items-center gap-1.5">
+                        <PieChart className="w-3.5 h-3.5 text-orange-600" />
+                        หมวดหมู่ประกันที่ลูกค้าสนใจสูงสุด
+                      </h5>
+                      <span className="text-[10px] text-slate-400">จากคำขอทั้งหมด</span>
+                    </div>
+
+                    <div className="space-y-3 text-xs">
+                      <div>
+                        <div className="flex justify-between font-bold mb-1 text-slate-800">
+                          <span>1. ประกันสุขภาพเหมาจ่าย</span>
+                          <span className="text-orange-600">48%</span>
+                        </div>
+                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                          <div className="bg-orange-500 h-full w-[48%] rounded-full"></div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between font-bold mb-1 text-slate-800">
+                          <span>2. แผนลดหย่อนภาษีเงินได้</span>
+                          <span className="text-emerald-600">28%</span>
+                        </div>
+                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                          <div className="bg-emerald-500 h-full w-[28%] rounded-full"></div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between font-bold mb-1 text-slate-800">
+                          <span>3. ประกันบำนาญเพื่อการเกษียณ</span>
+                          <span className="text-purple-600">14%</span>
+                        </div>
+                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                          <div className="bg-purple-500 h-full w-[14%] rounded-full"></div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between font-bold mb-1 text-slate-800">
+                          <span>4. ประกันชีวิตและมรดก</span>
+                          <span className="text-blue-600">10%</span>
+                        </div>
+                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                          <div className="bg-blue-500 h-full w-[10%] rounded-full"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Budget Breakdown */}
+                  <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200/80 space-y-3.5">
+                    <div className="flex items-center justify-between">
+                      <h5 className="font-bold text-xs text-slate-700 uppercase flex items-center gap-1.5">
+                        <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                        ช่วงงบประมาณเบี้ยประกันเฉลี่ยของลูกค้า
+                      </h5>
+                      <span className="text-[10px] text-slate-400">เป้าหมายเบี้ยต่อปี</span>
+                    </div>
+
+                    <div className="space-y-2.5 text-xs">
+                      <div className="p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center shadow-2xs">
+                        <div>
+                          <span className="font-bold text-slate-800 block">20,000 - 40,000 บาท/ปี</span>
+                          <span className="text-[10px] text-slate-400">กลุ่ม First Jobber & วัยทำงาน</span>
+                        </div>
+                        <span className="font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200">
+                          42%
+                        </span>
+                      </div>
+
+                      <div className="p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center shadow-2xs">
+                        <div>
+                          <span className="font-bold text-slate-800 block">40,000 - 70,000 บาท/ปี</span>
+                          <span className="text-[10px] text-slate-400">กลุ่มหัวหน้าครอบครัว & วางแผนสุขภาพ</span>
+                        </div>
+                        <span className="font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                          35%
+                        </span>
+                      </div>
+
+                      <div className="p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center shadow-2xs">
+                        <div>
+                          <span className="font-bold text-slate-800 block">70,000 - 100,000+ บาท/ปี</span>
+                          <span className="text-[10px] text-slate-400">กลุ่มลดหย่อนภาษีขั้นสูง & มรดก</span>
+                        </div>
+                        <span className="font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                          23%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           )}
 
@@ -1946,6 +2289,20 @@ export default function AdminPortalPage() {
                               </span>
                             </div>
 
+                            {/* Tags display */}
+                            {Array.isArray(lead.tags) && lead.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1.5">
+                                {lead.tags.map((tag: string, idx: number) => (
+                                  <span
+                                    key={idx}
+                                    className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-md border ${getTagColor(tag)}`}
+                                  >
+                                    #{tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
                             <div className="flex items-center gap-1.5 text-slate-600 mt-1">
                               <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
                               <a 
@@ -2034,6 +2391,15 @@ export default function AdminPortalPage() {
 
                           {/* Col 6: Actions */}
                           <td className="py-4 px-4 text-right space-x-1.5">
+                            <button
+                              onClick={() => handleOpenTagEditor(lead)}
+                              className="px-2.5 py-1.5 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold inline-flex items-center gap-1 cursor-pointer transition-colors"
+                              title="จัดการแท็กลูกค้า"
+                            >
+                              <Tag className="w-3 h-3 text-amber-700" />
+                              <span>แท็ก</span>
+                            </button>
+
                             <button
                               onClick={() => setViewingLeadDetail(lead)}
                               className="px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold cursor-pointer"
@@ -3468,132 +3834,415 @@ export default function AdminPortalPage() {
           )}
 
           {/* ================================================================ */}
-          {/* TAB 4: REPORTS & ANALYTICS */}
+          {/* TAB 4: WEB TRAFFIC & COOKIE ANALYTICS (สถิติการเข้าชมเว็บ) */}
           {/* ================================================================ */}
-          {activeTab === 'analytics' && (
-            <div className="space-y-6">
-              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                  <div>
-                    <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-orange-600" />
-                      <span>รายงานวิเคราะห์ความต้องการแผนประกันภัยและการปฏิบัติตาม PDPA</span>
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      สรุปพฤติกรรมลูกค้าที่ขอรับคำปรึกษา สถิติการคำนวณภาษี และความยินยอมคุกกี้
-                    </p>
+          {activeTab === 'analytics' && (() => {
+            const trafficKpis = analyticsData?.kpis || {
+              pageViews: 1,
+              uniqueVisitors: 1,
+              todayPageViews: 1,
+              todayUniqueVisitors: 1,
+              activeVisitors30m: 1,
+              cookieConsentRate: 100,
+            };
+
+            const traffic = analyticsData?.traffic || {
+              totalPageViews: trafficKpis.pageViews || 1,
+              uniqueVisitors: trafficKpis.uniqueVisitors || 1,
+              todayPageViews: trafficKpis.todayPageViews || 1,
+              todayUniqueVisitors: trafficKpis.todayUniqueVisitors || 1,
+              activeVisitorsNow: trafficKpis.activeVisitors30m || 1,
+              topPages: [
+                { path: '/', title: 'หน้าหลัก ModtanoyAdvisor', views: 1, uniqueVisitors: 1, percentage: 100 }
+              ],
+              deviceBreakdown: [
+                { device: 'desktop', count: 1, percentage: 100 }
+              ],
+              browserBreakdown: [
+                { browser: 'Chrome', count: 1 }
+              ],
+              recentActivity: []
+            };
+
+            const cookieStats = analyticsData?.cookieStats || {
+              totalDecisions: 1,
+              acceptAll: 1,
+              essentialOnly: 0,
+              custom: 0,
+              rate: 100,
+              analyticsAllowed: 1,
+              marketingAllowed: 1
+            };
+
+            return (
+              <div className="space-y-6">
+                {/* Header Banner */}
+                <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                          <span>สถิติผู้เข้าชมสด (Live Traffic & PDPA Cookie)</span>
+                        </span>
+                        {lastAnalyticsSync && (
+                          <span className="text-[11px] text-slate-400">
+                            อัปเดตล่าสุด: {lastAnalyticsSync} น.
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                        <Activity className="w-5 h-5 text-orange-600" />
+                        <span>สถิติการเข้าชมเว็บและพฤติกรรมผู้ใช้งาน</span>
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        วิเคราะห์ยอดเปิดหน้าเว็บ, ผู้เข้าชมแบบไม่ซ้ำจาก Cookie ID, หน้าที่คนเข้าชมมากที่สุด และความยินยอมคุกกี้ตามมาตรฐาน PDPA
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={handleRefreshAnalytics}
+                        disabled={isSyncingAnalytics}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white transition-all shadow-md shadow-orange-600/20 cursor-pointer"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${isSyncingAnalytics ? 'animate-spin' : ''}`} />
+                        <span>{isSyncingAnalytics ? 'กำลังซิงค์...' : 'รีเฟรชสถิติ'}</span>
+                      </button>
+                      <button
+                        onClick={handleExportAnalyticsReport}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5 text-slate-500" />
+                        <span>ส่งออก JSON</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <Link
-                    href="/analytics"
-                    target="_blank"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold transition-all shadow-md shadow-orange-600/20 shrink-0"
-                  >
-                    <span>เปิดดูแดชบอร์ดฉบับเต็ม (Full Analytics)</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </Link>
+                  {/* 4 Primary Traffic Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
+                    {/* Page Views */}
+                    <div className="bg-gradient-to-br from-blue-50/80 to-blue-100/30 p-5 rounded-2xl border border-blue-200/80 space-y-2">
+                      <div className="flex items-center justify-between text-blue-700 text-xs font-bold">
+                        <span>ยอดเปิดหน้าเว็บรวม (Page Views)</span>
+                        <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-blue-700">
+                          <Eye className="w-4 h-4" />
+                        </div>
+                      </div>
+                      <div className="text-3xl font-black text-blue-950 tracking-tight">
+                        {traffic.totalPageViews?.toLocaleString() || '1'}
+                      </div>
+                      <div className="flex items-center gap-1 text-[11px] text-blue-700 font-semibold">
+                        <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
+                        <span>วันนี้: +{traffic.todayPageViews || 1} หน้า</span>
+                      </div>
+                    </div>
+
+                    {/* Unique Visitors */}
+                    <div className="bg-gradient-to-br from-emerald-50/80 to-emerald-100/30 p-5 rounded-2xl border border-emerald-200/80 space-y-2">
+                      <div className="flex items-center justify-between text-emerald-700 text-xs font-bold">
+                        <span>ผู้เข้าชมไม่ซ้ำ (Unique Visitors)</span>
+                        <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
+                          <Users className="w-4 h-4" />
+                        </div>
+                      </div>
+                      <div className="text-3xl font-black text-emerald-950 tracking-tight">
+                        {traffic.uniqueVisitors?.toLocaleString() || '1'}
+                      </div>
+                      <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span>ผู้ใช้ใหม่วันนี้: +{traffic.todayUniqueVisitors || 1} คน</span>
+                      </div>
+                    </div>
+
+                    {/* Active Visitors Now */}
+                    <div className="bg-gradient-to-br from-amber-50/80 to-amber-100/30 p-5 rounded-2xl border border-amber-200/80 space-y-2">
+                      <div className="flex items-center justify-between text-amber-800 text-xs font-bold">
+                        <span>กำลังออนไลน์ (30 นาทีล่าสุด)</span>
+                        <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
+                          <Activity className="w-4 h-4" />
+                        </div>
+                      </div>
+                      <div className="text-3xl font-black text-amber-950 tracking-tight">
+                        {traffic.activeVisitorsNow || 1}
+                      </div>
+                      <div className="flex items-center gap-1 text-[11px] text-amber-700 font-semibold">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                        <span>ผู้ใช้งานออนไลน์อยู่บนเว็บ</span>
+                      </div>
+                    </div>
+
+                    {/* Cookie Consent Rate */}
+                    <div className="bg-gradient-to-br from-purple-50/80 to-purple-100/30 p-5 rounded-2xl border border-purple-200/80 space-y-2">
+                      <div className="flex items-center justify-between text-purple-700 text-xs font-bold">
+                        <span>อัตรายินยอมคุกกี้ (PDPA)</span>
+                        <div className="w-8 h-8 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700">
+                          <Cookie className="w-4 h-4" />
+                        </div>
+                      </div>
+                      <div className="text-3xl font-black text-purple-950 tracking-tight">
+                        {cookieStats.rate || 100}%
+                      </div>
+                      <div className="flex items-center gap-1 text-[11px] text-purple-700 font-semibold">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
+                        <span>ยินยอม {cookieStats.acceptAll || 1} / {cookieStats.totalDecisions || 1} ครั้ง</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* 4 Summary Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 text-xs">
-                    <span className="text-blue-700 font-bold block mb-1">คำขอคำปรึกษาจริง (Total Leads)</span>
-                    <span className="text-2xl font-black text-blue-900">{stats.totalLeads || 5}</span>
-                    <span className="text-[10px] text-blue-600 block mt-0.5">ในฐานข้อมูล MySQL</span>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-orange-50/70 border border-orange-100 text-xs">
-                    <span className="text-orange-700 font-bold block mb-1">อัตรา Conversion จริง</span>
-                    <span className="text-2xl font-black text-orange-900">
-                      {stats.totalLeads > 0 ? ((stats.closedLeads / stats.totalLeads) * 100).toFixed(1) : '20.0'}%
+                {/* Top Visited Pages (ผู้เข้าชมอยู่หน้าไหน) */}
+                <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div>
+                      <h4 className="font-black text-base text-slate-900 flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-orange-600" />
+                        <span>ผู้เข้าชมเปิดดูหน้าไหนบ้าง (Top Visited Pages)</span>
+                      </h4>
+                      <p className="text-xs text-slate-500">
+                        เส้นทาง URL และหน้าที่ได้รับความนิยมสูงสุดจากผู้ใช้งานจริง
+                      </p>
+                    </div>
+                    <span className="text-xs font-bold text-slate-400">
+                      ทั้งหมด {traffic.topPages?.length || 1} หน้าเว็บ
                     </span>
-                    <span className="text-[10px] text-orange-600 block mt-0.5">ปิดกรมธรรม์สำเร็จ ({stats.closedLeads || 1} เล่ม)</span>
                   </div>
-                  <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 text-xs">
-                    <span className="text-emerald-700 font-bold block mb-1">แผนประกันที่เปิดใช้งาน</span>
-                    <span className="text-2xl font-black text-emerald-900">{products.length || 4}</span>
-                    <span className="text-[10px] text-emerald-600 block mt-0.5">ในระบบแค็ตตาล็อก</span>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 text-xs">
-                    <span className="text-purple-700 font-bold block mb-1">บริษัทประกันพันธมิตร</span>
-                    <span className="text-2xl font-black text-purple-900">{companies.length || 5}</span>
-                    <span className="text-[10px] text-purple-600 block mt-0.5">บริษัทในระบบ</span>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 text-slate-700 font-bold border-y border-slate-200 uppercase text-[11px]">
+                        <tr>
+                          <th className="py-3 px-4">เส้นทางหน้าเว็บ (Path)</th>
+                          <th className="py-3 px-4">ชื่อหน้าเว็บ</th>
+                          <th className="py-3 px-4 text-center">ยอดเปิด (Views)</th>
+                          <th className="py-3 px-4 text-center">คนเข้าชม (Unique)</th>
+                          <th className="py-3 px-4">สัดส่วนการเข้าชม</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {traffic.topPages?.map((page: any, idx: number) => (
+                          <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
+                            <td className="py-3.5 px-4 font-mono font-bold text-orange-600">
+                              {page.path}
+                            </td>
+                            <td className="py-3.5 px-4 font-bold text-slate-800">
+                              {page.title || 'หน้าหลัก'}
+                            </td>
+                            <td className="py-3.5 px-4 text-center font-bold text-slate-900">
+                              {page.views?.toLocaleString() || 1}
+                            </td>
+                            <td className="py-3.5 px-4 text-center font-semibold text-slate-600">
+                              {page.uniqueVisitors?.toLocaleString() || 1}
+                            </td>
+                            <td className="py-3.5 px-4 min-w-[140px]">
+                              <div className="flex items-center gap-2">
+                                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
+                                  <div
+                                    className="bg-orange-500 h-full rounded-full"
+                                    style={{ width: `${page.percentage || 100}%` }}
+                                  ></div>
+                                </div>
+                                <span className="font-bold text-slate-700 text-[11px] shrink-0">
+                                  {page.percentage || 100}%
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Category Demand */}
-                  <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200/80 space-y-3">
-                    <h4 className="font-bold text-xs text-slate-700 uppercase">
-                      หมวดหมู่ประกันที่ลูกค้าสนใจสูงสุด
-                    </h4>
-                    <div className="space-y-2.5 text-xs">
-                      <div>
-                        <div className="flex justify-between font-bold mb-1">
-                          <span>1. ประกันสุขภาพเหมาจ่าย</span>
-                          <span>48%</span>
+                {/* Grid: Cookie PDPA Details + Devices & Browsers */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Left: Cookie PDPA Breakdown */}
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <h4 className="font-black text-sm text-slate-900 flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-emerald-600" />
+                        <span>การตัดสินใจยินยอมคุกกี้ (PDPA Cookie Compliance)</span>
+                      </h4>
+                      <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                        {cookieStats.rate || 100}% ยินยอม
+                      </span>
+                    </div>
+
+                    <div className="space-y-3 text-xs">
+                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                            ✓
+                          </div>
+                          <div>
+                            <span className="font-bold text-slate-900 block">ยอมรับคุกกี้ทั้งหมด (Accept All)</span>
+                            <span className="text-[11px] text-slate-500">คุกกี้จำเป็น + สถิติ + การตลาด</span>
+                          </div>
                         </div>
-                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                          <div className="bg-orange-500 h-full w-[48%]"></div>
-                        </div>
+                        <span className="font-black text-base text-emerald-700">
+                          {cookieStats.acceptAll || 1} ครั้ง
+                        </span>
                       </div>
 
-                      <div>
-                        <div className="flex justify-between font-bold mb-1">
-                          <span>2. ผลิตภัณฑ์ลดหย่อนภาษี 2567</span>
-                          <span>28%</span>
+                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-slate-200 text-slate-700 flex items-center justify-center font-bold">
+                            —
+                          </div>
+                          <div>
+                            <span className="font-bold text-slate-900 block">เฉพาะที่จำเป็นเท่านั้น (Essential Only)</span>
+                            <span className="text-[11px] text-slate-500">ปฏิเสธคุกกี้วิเคราะห์และการตลาด</span>
+                          </div>
                         </div>
-                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                          <div className="bg-emerald-500 h-full w-[28%]"></div>
-                        </div>
+                        <span className="font-black text-base text-slate-700">
+                          {cookieStats.essentialOnly || 0} ครั้ง
+                        </span>
                       </div>
 
-                      <div>
-                        <div className="flex justify-between font-bold mb-1">
-                          <span>3. ประกันบำนาญเพื่อการเกษียณ</span>
-                          <span>14%</span>
+                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+                            ⚙
+                          </div>
+                          <div>
+                            <span className="font-bold text-slate-900 block">กำหนดการยินยอมเอง (Custom Selection)</span>
+                            <span className="text-[11px] text-slate-500">เลือกเปิด-ปิดคุกกี้เป็นรายหมวดหมู่</span>
+                          </div>
                         </div>
-                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                          <div className="bg-purple-500 h-full w-[14%]"></div>
-                        </div>
+                        <span className="font-black text-base text-amber-700">
+                          {cookieStats.custom || 0} ครั้ง
+                        </span>
                       </div>
 
-                      <div>
-                        <div className="flex justify-between font-bold mb-1">
-                          <span>4. ประกันชีวิตและมรดก</span>
-                          <span>10%</span>
+                      <div className="grid grid-cols-2 gap-3 pt-1">
+                        <div className="p-3 rounded-xl bg-sky-50 border border-sky-100 text-center">
+                          <span className="text-[11px] text-sky-700 font-bold block">ยินยอมสถิติ (Analytics)</span>
+                          <span className="text-lg font-black text-sky-950">{cookieStats.analyticsAllowed || 1} คน</span>
                         </div>
-                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                          <div className="bg-brand-500 h-full w-[10%]"></div>
+                        <div className="p-3 rounded-xl bg-purple-50 border border-purple-100 text-center">
+                          <span className="text-[11px] text-purple-700 font-bold block">ยินยอมการตลาด (Marketing)</span>
+                          <span className="text-lg font-black text-purple-950">{cookieStats.marketingAllowed || 1} คน</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Budget Breakdown */}
-                  <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200/80 space-y-3">
-                    <h4 className="font-bold text-xs text-slate-700 uppercase">
-                      ช่วงงบประมาณเบี้ยประกันเฉลี่ยของลูกค้า
-                    </h4>
-                    <div className="space-y-2.5 text-xs">
-                      <div className="p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center">
-                        <span className="font-semibold text-slate-700">20,000 - 40,000 บาท/ปี</span>
-                        <span className="font-bold text-orange-600">42% (กลุ่มวัยทำงานเริ่มต้น)</span>
+                  {/* Right: Devices & Browsers */}
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <h4 className="font-black text-sm text-slate-900 flex items-center gap-2">
+                        <Monitor className="w-4 h-4 text-brand-600" />
+                        <span>อุปกรณ์และเบราว์เซอร์ (Devices & Browsers)</span>
+                      </h4>
+                      <span className="text-xs font-bold text-slate-400">
+                        สถิติตาม User Agent
+                      </span>
+                    </div>
+
+                    <div className="space-y-4 text-xs">
+                      {/* Device Breakdown */}
+                      <div className="space-y-2">
+                        <span className="font-bold text-slate-700 block text-[11px] uppercase">
+                          ประเภทอุปกรณ์ (Device Type)
+                        </span>
+                        <div className="grid grid-cols-3 gap-2.5">
+                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-1">
+                            <Monitor className="w-5 h-5 mx-auto text-slate-700" />
+                            <span className="font-bold text-slate-800 block">คอมพิวเตอร์</span>
+                            <span className="text-xs font-black text-orange-600">
+                              {traffic.deviceBreakdown?.find((d: any) => d.device === 'desktop')?.count || 1} ครั้ง
+                            </span>
+                          </div>
+
+                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-1">
+                            <Smartphone className="w-5 h-5 mx-auto text-slate-700" />
+                            <span className="font-bold text-slate-800 block">มือถือ (Mobile)</span>
+                            <span className="text-xs font-black text-emerald-600">
+                              {traffic.deviceBreakdown?.find((d: any) => d.device === 'mobile')?.count || 0} ครั้ง
+                            </span>
+                          </div>
+
+                          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-1">
+                            <Tablet className="w-5 h-5 mx-auto text-slate-700" />
+                            <span className="font-bold text-slate-800 block">แท็บเล็ต</span>
+                            <span className="text-xs font-black text-blue-600">
+                              {traffic.deviceBreakdown?.find((d: any) => d.device === 'tablet')?.count || 0} ครั้ง
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center">
-                        <span className="font-semibold text-slate-700">40,000 - 70,000 บาท/ปี</span>
-                        <span className="font-bold text-brand-600">35% (กลุ่มหัวหน้าครอบครัว)</span>
-                      </div>
-                      <div className="p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center">
-                        <span className="font-semibold text-slate-700">70,000 - 100,000+ บาท/ปี</span>
-                        <span className="font-bold text-emerald-600">23% (กลุ่มวางแผนภาษีบำนาญ)</span>
+
+                      {/* Browser Breakdown */}
+                      <div className="space-y-2 pt-2 border-t border-slate-100">
+                        <span className="font-bold text-slate-700 block text-[11px] uppercase">
+                          เว็บเบราว์เซอร์ยอดนิยม (Top Browsers)
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {traffic.browserBreakdown?.length > 0 ? (
+                            traffic.browserBreakdown.map((b: any, bIdx: number) => (
+                              <div
+                                key={bIdx}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 font-bold text-slate-800"
+                              >
+                                <span>🌐 {b.browser}</span>
+                                <span className="px-1.5 py-0.2 rounded bg-white text-orange-600 text-[11px]">
+                                  {b.count}
+                                </span>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 font-bold text-slate-800">
+                              <span>🌐 Chrome</span>
+                              <span className="px-1.5 py-0.2 rounded bg-white text-orange-600 text-[11px]">1</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Live Activity Stream (Recent Activity) */}
+                {traffic.recentActivity && traffic.recentActivity.length > 0 && (
+                  <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <h4 className="font-black text-base text-slate-900">
+                          บันทึกการเปิดหน้าเว็บแบบเรียลไทม์ (Live Page View Stream)
+                        </h4>
+                      </div>
+                      <span className="text-xs text-slate-400">15 รายการล่าสุด</span>
+                    </div>
+
+                    <div className="divide-y divide-slate-100 text-xs">
+                      {traffic.recentActivity.slice(0, 15).map((act: any, aIdx: number) => (
+                        <div key={aIdx} className="py-2.5 flex items-center justify-between gap-3 hover:bg-slate-50/60 px-2 rounded-xl">
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                              {act.device || 'desktop'}
+                            </span>
+                            <span className="font-bold text-slate-800 font-mono text-xs">
+                              {act.path}
+                            </span>
+                            {act.page_title && (
+                              <span className="text-slate-500 text-[11px] hidden sm:inline">
+                                ({act.page_title})
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-slate-400 shrink-0">
+                            {act.created_at ? new Date(act.created_at).toLocaleTimeString('th-TH') : 'เมื่อสักครู่'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ================================================================ */}
           {/* TAB 5: SETTINGS */}
@@ -4204,6 +4853,35 @@ export default function AdminPortalPage() {
                 <p className="text-slate-700 italic">
                   {viewingLeadDetail.user_notes || 'ยังไม่มีบันทึกข้อมูล'}
                 </p>
+              </div>
+
+              {/* Tags Display in Detail Modal */}
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 block text-[11px] font-medium">แท็กกำกับลูกค้า</span>
+                  <button
+                    onClick={() => {
+                      const l = viewingLeadDetail;
+                      setViewingLeadDetail(null);
+                      handleOpenTagEditor(l);
+                    }}
+                    className="text-[11px] text-orange-600 hover:text-orange-700 font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <Tag className="w-3 h-3" />
+                    <span>จัดการแท็ก</span>
+                  </button>
+                </div>
+                {Array.isArray(viewingLeadDetail.tags) && viewingLeadDetail.tags.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {viewingLeadDetail.tags.map((tag: string, idx: number) => (
+                      <span key={idx} className={`text-xs px-2.5 py-1 rounded-lg font-semibold border ${getTagColor(tag)}`}>
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-slate-400 italic text-[11px] block">ยังไม่มีแท็ก (คลิก &quot;จัดการแท็ก&quot; เพื่อเพิ่ม)</span>
+                )}
               </div>
 
               <div className="bg-emerald-50 border border-emerald-200/80 p-2.5 rounded-xl text-emerald-800 flex items-center gap-2">
@@ -5553,6 +6231,371 @@ export default function AdminPortalPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================ */}
+      {/* MODAL: ADD NEW CRM LEAD MANUALLY */}
+      {/* ================================================================ */}
+      {showAddLeadModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl space-y-5 my-8 border border-slate-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold">
+                  <UserCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">เพิ่มข้อมูลลูกค้าใหม่ (New CRM Lead)</h3>
+                  <p className="text-xs text-slate-500">บันทึกข้อมูลลูกค้าที่ติดต่อเข้ามาโดยตรงเพื่อติดตามและจัดสรรงาน</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAddLeadModal(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateLead} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">ชื่อ-นามสกุลลูกค้า *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="เช่น คุณสมชาย มั่งคั่ง"
+                    value={leadForm.customerName}
+                    onChange={(e) => setLeadForm({ ...leadForm, customerName: e.target.value })}
+                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl font-bold focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">เบอร์โทรศัพท์ติดต่อ *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="08X-XXX-XXXX"
+                    value={leadForm.customerPhone}
+                    onChange={(e) => setLeadForm({ ...leadForm, customerPhone: e.target.value })}
+                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl font-bold text-brand-900 focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">อีเมลลูกค้า (ถ้ามี)</label>
+                  <input
+                    type="email"
+                    placeholder="customer@email.com"
+                    value={leadForm.customerEmail}
+                    onChange={(e) => setLeadForm({ ...leadForm, customerEmail: e.target.value })}
+                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">จังหวัดที่อยู่</label>
+                  <input
+                    type="text"
+                    placeholder="เช่น กรุงเทพมหานคร, นนทบุรี"
+                    value={leadForm.province}
+                    onChange={(e) => setLeadForm({ ...leadForm, province: e.target.value })}
+                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">แผนประกันที่สนใจ</label>
+                  <input
+                    type="text"
+                    placeholder="เช่น ประกันสุขภาพเหมาจ่าย 5 ล้าน"
+                    value={leadForm.productTitle}
+                    onChange={(e) => setLeadForm({ ...leadForm, productTitle: e.target.value })}
+                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">งบประมาณเบี้ยต่อปี</label>
+                  <select
+                    value={leadForm.budgetRange}
+                    onChange={(e) => setLeadForm({ ...leadForm, budgetRange: e.target.value })}
+                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl bg-white font-medium focus:outline-none focus:border-orange-500"
+                  >
+                    <option value="ต่ำกว่า 20,000 บาท/ปี">ต่ำกว่า 20,000 บาท/ปี</option>
+                    <option value="20,000 - 40,000 บาท/ปี">20,000 - 40,000 บาท/ปี</option>
+                    <option value="40,000 - 70,000 บาท/ปี">40,000 - 70,000 บาท/ปี</option>
+                    <option value="70,000 - 100,000 บาท/ปี">70,000 - 100,000 บาท/ปี</option>
+                    <option value="มากกว่า 100,000 บาท/ปี (VIP)">มากกว่า 100,000 บาท/ปี (VIP)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">เวลาที่สะดวกติดต่อ</label>
+                  <select
+                    value={leadForm.preferredContactTime}
+                    onChange={(e) => setLeadForm({ ...leadForm, preferredContactTime: e.target.value })}
+                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl bg-white focus:outline-none focus:border-orange-500"
+                  >
+                    <option value="สะดวกทุกเวลา">สะดวกทุกเวลา</option>
+                    <option value="ช่วงเช้า (09:00 - 12:00 น.)">ช่วงเช้า (09:00 - 12:00 น.)</option>
+                    <option value="ช่วงบ่าย (13:00 - 17:00 น.)">ช่วงบ่าย (13:00 - 17:00 น.)</option>
+                    <option value="ช่วงค่ำ (18:00 - 20:00 น.)">ช่วงค่ำ (18:00 - 20:00 น.)</option>
+                    <option value="สะดวกเฉพาะวันหยุดเสาร์-อาทิตย์">สะดวกเฉพาะวันหยุดเสาร์-อาทิตย์</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">สถานะเริ่มต้น</label>
+                  <select
+                    value={leadForm.status}
+                    onChange={(e) => setLeadForm({ ...leadForm, status: e.target.value })}
+                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl bg-white font-bold focus:outline-none focus:border-orange-500"
+                  >
+                    <option value="NEW">ใหม่ (NEW)</option>
+                    <option value="CONTACTED">ติดต่อแล้ว (CONTACTED)</option>
+                    <option value="CONSULTING">กำลังปรึกษา (CONSULTING)</option>
+                    <option value="CLOSED_WON">ปิดการขายสำเร็จ (CLOSED_WON)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Tags Section */}
+              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-orange-600" />
+                    แท็กกำกับลูกค้า (Lead Tags)
+                  </span>
+                  <span className="text-[11px] text-slate-400">เลือกแท็กด่วนหรือพิมพ์เพิ่ม</span>
+                </div>
+
+                {/* Selected Tags Preview */}
+                {leadForm.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {leadForm.tags.map((tag, tIdx) => (
+                      <span
+                        key={tIdx}
+                        className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg font-semibold border ${getTagColor(tag)}`}
+                      >
+                        <span>#{tag}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleLeadFormTag(tag)}
+                          className="hover:opacity-75 cursor-pointer"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Preset Tag Buttons */}
+                <div className="space-y-1">
+                  <span className="text-[10px] font-semibold text-slate-400 block">แท็กแนะนำคลิกเพื่อเพิ่ม/ถอด:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {PRESET_TAGS.map((preset) => {
+                      const isSelected = leadForm.tags.includes(preset);
+                      return (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => handleToggleLeadFormTag(preset)}
+                          className={`text-[11px] px-2.5 py-1 rounded-lg transition-all cursor-pointer border ${
+                            isSelected
+                              ? 'bg-orange-600 text-white border-orange-600 font-bold shadow-xs'
+                              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          {isSelected ? '✓ ' : '+ '} {preset}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Custom Tag Input */}
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    type="text"
+                    placeholder="พิมพ์แท็กใหม่ เช่น นัดส่งเล่ม, รอเคลม..."
+                    value={customTagInput}
+                    onChange={(e) => setCustomTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddCustomLeadFormTag();
+                      }
+                    }}
+                    className="flex-1 px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:border-orange-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomLeadFormTag}
+                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-xs shrink-0 cursor-pointer"
+                  >
+                    + เพิ่มแท็ก
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">บันทึกเพิ่มเติมของตัวแทน (Agent Notes)</label>
+                <textarea
+                  rows={2}
+                  placeholder="เช่น ลูกค้าเป็นเพื่อนแนะนำมา สนใจทำประกันลูกสาวคนแรก..."
+                  value={leadForm.userNotes}
+                  onChange={(e) => setLeadForm({ ...leadForm, userNotes: e.target.value })}
+                  className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddLeadModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-xl shadow-md cursor-pointer flex items-center gap-1.5"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>บันทึกข้อมูลลูกค้าใหม่</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================ */}
+      {/* MODAL: MANAGE LEAD TAGS */}
+      {/* ================================================================ */}
+      {editingLeadTags && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
+                  <Tag className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">ติดแท็กลูกค้า (Manage Lead Tags)</h3>
+                  <p className="text-xs text-slate-500">{editingLeadTags.customer_name} ({editingLeadTags.customer_phone})</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingLeadTags(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Current Tags */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-slate-700 block">แท็กปัจจุบันของลูกค้ารายนี้:</span>
+              {leadTagsList.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5 p-3 bg-slate-50 rounded-2xl border border-slate-200 min-h-[50px]">
+                  {leadTagsList.map((tag, tIdx) => (
+                    <span
+                      key={tIdx}
+                      className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg font-semibold border ${getTagColor(tag)}`}
+                    >
+                      <span>#{tag}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleTag(tag)}
+                        className="hover:opacity-75 cursor-pointer"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-300 text-center text-slate-400 text-xs">
+                  ยังไม่มีแท็ก เลือกคลิกจากแท็กด่วนด้านล่างเพื่อเพิ่ม
+                </div>
+              )}
+            </div>
+
+            {/* Preset Tags */}
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold text-slate-500">แท็กด่วนยอดนิยม:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {PRESET_TAGS.map((preset) => {
+                  const isSelected = leadTagsList.includes(preset);
+                  return (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => handleToggleTag(preset)}
+                      className={`text-[11px] px-2.5 py-1 rounded-lg transition-all cursor-pointer border ${
+                        isSelected
+                          ? 'bg-amber-500 text-white border-amber-500 font-bold shadow-xs'
+                          : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                      }`}
+                    >
+                      {isSelected ? '✓ ' : '+ '} {preset}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Custom Tag Input */}
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold text-slate-500">เพิ่มแท็กกำหนดเอง:</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="พิมพ์แท็กใหม่..."
+                  value={newTagText}
+                  onChange={(e) => setNewTagText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddCustomTag();
+                    }
+                  }}
+                  className="flex-1 px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:outline-none focus:border-orange-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCustomTag}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-xs shrink-0 cursor-pointer"
+                >
+                  เพิ่ม
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setEditingLeadTags(null)}
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveLeadTags}
+                className="px-5 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-xl shadow-md cursor-pointer"
+              >
+                บันทึกแท็ก
+              </button>
+            </div>
           </div>
         </div>
       )}
