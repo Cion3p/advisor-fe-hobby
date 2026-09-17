@@ -3471,17 +3471,51 @@ export default function AdminPortalPage() {
           {/* TAB 4: REPORTS & ANALYTICS */}
           {/* ================================================================ */}
           {activeTab === 'analytics' && (
-
             <div className="space-y-6">
               <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
-                <div>
-                  <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-orange-600" />
-                    <span>รายงานวิเคราะห์ความต้องการแผนประกันภัย (Market Insights)</span>
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    สรุปพฤติกรรมลูกค้าที่ขอรับคำปรึกษาและสถิติการใช้งานเครื่องคำนวณภาษี
-                  </p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-orange-600" />
+                      <span>รายงานวิเคราะห์ความต้องการแผนประกันภัยและการปฏิบัติตาม PDPA</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      สรุปพฤติกรรมลูกค้าที่ขอรับคำปรึกษา สถิติการคำนวณภาษี และความยินยอมคุกกี้
+                    </p>
+                  </div>
+
+                  <Link
+                    href="/analytics"
+                    target="_blank"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold transition-all shadow-md shadow-orange-600/20 shrink-0"
+                  >
+                    <span>เปิดดูแดชบอร์ดฉบับเต็ม (Full Analytics)</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+
+                {/* 4 Summary Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 text-xs">
+                    <span className="text-blue-700 font-bold block mb-1">ผู้เข้าชมเฉลี่ย</span>
+                    <span className="text-2xl font-black text-blue-900">18,450</span>
+                    <span className="text-[10px] text-blue-600 block mt-0.5">+18.4% ต่อเดือน</span>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-orange-50/70 border border-orange-100 text-xs">
+                    <span className="text-orange-700 font-bold block mb-1">อัตรา Conversion</span>
+                    <span className="text-2xl font-black text-orange-900">1.33%</span>
+                    <span className="text-[10px] text-orange-600 block mt-0.5">Leads ขอรับคำปรึกษา</span>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 text-xs">
+                    <span className="text-emerald-700 font-bold block mb-1">การคำนวณภาษี</span>
+                    <span className="text-2xl font-black text-emerald-900">4,820</span>
+                    <span className="text-[10px] text-emerald-600 block mt-0.5">ครั้งที่กดจำลองสิทธิ</span>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 text-xs">
+                    <span className="text-purple-700 font-bold block mb-1">PDPA Consent Rate</span>
+                    <span className="text-2xl font-black text-purple-900">92.4%</span>
+                    <span className="text-[10px] text-purple-600 block mt-0.5">อัตรายอมรับคุกกี้</span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

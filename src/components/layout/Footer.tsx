@@ -117,6 +117,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/analytics" className="hover:text-white transition-colors flex items-center gap-1.5 text-sky-300">
+                  <Award className="w-4 h-4 text-sky-400" />
+                  รายงานวิเคราะห์ข้อมูล (Analytics)
+                </Link>
+              </li>
+              <li>
                 <Link href="/consultation" className="hover:text-white transition-colors">
                   ลงทะเบียนติดต่อตัวแทน
                 </Link>
