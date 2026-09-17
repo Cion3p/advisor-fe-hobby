@@ -1,4 +1,4 @@
-import { Product, Category, TaxCalculationResult, LifeValueResult, Article, HeroSlide, AnnouncementPopup } from '../types';
+import { Company, Product, Category, TaxCalculationResult, LifeValueResult, Article, HeroSlide, AnnouncementPopup } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
@@ -505,6 +505,23 @@ export async function updateLeadStatusAPI(id: number, status: string, notes?: st
   }
 }
 
+export async function deleteLeadAPI(id: number) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/leads/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete lead');
+    return await res.json();
+  } catch {
+    const idx = FALLBACK_LEADS.findIndex((l) => l.id === id);
+    if (idx !== -1) {
+      FALLBACK_LEADS.splice(idx, 1);
+    }
+    return { success: true, leadId: id };
+  }
+}
+
+
 export async function fetchAdminStatsAPI() {
   try {
     const res = await fetch(`${API_BASE_URL}/admin/stats`, { cache: 'no-store' });
@@ -585,6 +602,160 @@ export async function deleteProductAPI(id: number) {
     return { success: true, id };
   }
 }
+
+// ---------------------------------------------------------
+// COMPANIES CRUD APIS
+// ---------------------------------------------------------
+export const FALLBACK_COMPANIES: Company[] = [
+  { id: 1, name: 'เอไอเอ ประเทศไทย (AIA)', code: 'AIA', logo_url: '/images/companies/aia.png', contact_phone: '1581' },
+  { id: 2, name: 'เมืองไทยประกันชีวิต (Muang Thai Life)', code: 'MTL', logo_url: '/images/companies/mtl.png', contact_phone: '1766' },
+  { id: 3, name: 'อลิอันซ์ อยุธยา (Allianz Ayudhya)', code: 'AZAY', logo_url: '/images/companies/azay.png', contact_phone: '1373' },
+  { id: 4, name: 'กรุงไทย-แอกซ่า (Krungthai-AXA)', code: 'KTAXA', logo_url: '/images/companies/ktaxa.png', contact_phone: '1159' },
+  { id: 5, name: 'เอฟดับบลิวดี ประกันชีวิต (FWD)', code: 'FWD', logo_url: '/images/companies/fwd.png', contact_phone: '1351' },
+  { id: 6, name: 'กรุงเทพประกันชีวิต (Bangkok Life Assurance)', code: 'BLA', logo_url: '/images/companies/bla.png', contact_phone: '02-777-8888' },
+];
+
+export async function fetchCompaniesAPI(): Promise<Company[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/companies`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch companies');
+    const json = await res.json();
+    return json.data || FALLBACK_COMPANIES;
+  } catch {
+    return FALLBACK_COMPANIES;
+  }
+}
+
+export async function createCompanyAPI(data: any) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/companies`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to create company');
+    return await res.json();
+  } catch {
+    const newComp: Company = {
+      id: FALLBACK_COMPANIES.length + 1,
+      name: data.name,
+      code: data.code,
+      logo_url: data.logoUrl || '/images/companies/default.png',
+      contact_phone: data.contactPhone || '1186',
+    };
+    FALLBACK_COMPANIES.push(newComp);
+    return { success: true, data: newComp };
+  }
+}
+
+export async function updateCompanyAPI(id: number, data: any) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/companies/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update company');
+    return await res.json();
+  } catch {
+    const idx = FALLBACK_COMPANIES.findIndex((c) => c.id === id);
+    if (idx !== -1) {
+      FALLBACK_COMPANIES[idx] = {
+        ...FALLBACK_COMPANIES[idx],
+        name: data.name ?? FALLBACK_COMPANIES[idx].name,
+        code: data.code ?? FALLBACK_COMPANIES[idx].code,
+        logo_url: data.logoUrl ?? FALLBACK_COMPANIES[idx].logo_url,
+        contact_phone: data.contactPhone ?? FALLBACK_COMPANIES[idx].contact_phone,
+      };
+    }
+    return { success: true, id };
+  }
+}
+
+export async function deleteCompanyAPI(id: number) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/companies/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete company');
+    return await res.json();
+  } catch {
+    const idx = FALLBACK_COMPANIES.findIndex((c) => c.id === id);
+    if (idx !== -1) {
+      FALLBACK_COMPANIES.splice(idx, 1);
+    }
+    return { success: true, id };
+  }
+}
+
+// ---------------------------------------------------------
+// CATEGORIES CRUD APIS
+// ---------------------------------------------------------
+export async function createCategoryAPI(data: any) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/categories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to create category');
+    return await res.json();
+  } catch {
+    const newCat: Category = {
+      id: FALLBACK_CATEGORIES.length + 1,
+      slug: data.slug,
+      name_th: data.nameTh,
+      name_en: data.nameEn || data.nameTh,
+      category_type: data.categoryType || 'INSURANCE',
+      description: data.description || '',
+      icon: data.icon || 'ShieldCheck',
+      product_count: 0,
+    };
+    FALLBACK_CATEGORIES.push(newCat);
+    return { success: true, data: newCat };
+  }
+}
+
+export async function updateCategoryAPI(id: number, data: any) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/categories/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update category');
+    return await res.json();
+  } catch {
+    const idx = FALLBACK_CATEGORIES.findIndex((c) => c.id === id);
+    if (idx !== -1) {
+      FALLBACK_CATEGORIES[idx] = {
+        ...FALLBACK_CATEGORIES[idx],
+        name_th: data.nameTh ?? FALLBACK_CATEGORIES[idx].name_th,
+        name_en: data.nameEn ?? FALLBACK_CATEGORIES[idx].name_en,
+        description: data.description ?? FALLBACK_CATEGORIES[idx].description,
+        icon: data.icon ?? FALLBACK_CATEGORIES[idx].icon,
+      };
+    }
+    return { success: true, id };
+  }
+}
+
+export async function deleteCategoryAPI(id: number) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/categories/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete category');
+    return await res.json();
+  } catch {
+    const idx = FALLBACK_CATEGORIES.findIndex((c) => c.id === id);
+    if (idx !== -1) {
+      FALLBACK_CATEGORIES.splice(idx, 1);
+    }
+    return { success: true, id };
+  }
+}
+
 
 // ---------------------------------------------------------
 // HERO SLIDER BANNER STORAGE & MANAGEMENT

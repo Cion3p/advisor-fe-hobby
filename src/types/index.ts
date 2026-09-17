@@ -4,6 +4,7 @@ export interface Company {
   code: string;
   logo_url: string;
   contact_phone: string;
+  is_active?: boolean | number;
 }
 
 export interface Category {
@@ -14,8 +15,10 @@ export interface Category {
   category_type: 'INSURANCE' | 'INVESTMENT' | 'TAX';
   description: string;
   icon: string;
+  sort_order?: number;
   product_count?: number;
 }
+
 
 export interface ProductPlan {
   id: number;
