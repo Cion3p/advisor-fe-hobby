@@ -68,10 +68,42 @@ export interface Product {
   benefits?: ProductBenefit[];
 }
 
+export interface OtherDeductionsInput {
+  socialSecurity?: number;
+  spouseAllowance?: boolean;
+  childrenCount?: number;
+  parentsCount?: number;
+  disabledCareCount?: number;
+  mortgageInterest?: number;
+  thaiEsg?: number;
+  rmfPvdSsf?: number;
+  easyEReceipt?: number;
+  educationDonation?: number;
+  generalDonation?: number;
+}
+
+export interface OtherDeductionsBreakdown {
+  socialSecurity: number;
+  spouse: number;
+  children: number;
+  parents: number;
+  disabledCare: number;
+  totalFamily: number;
+  mortgageInterest: number;
+  thaiEsg: number;
+  rmfPvdSsf: number;
+  totalInvestments: number;
+  easyEReceipt: number;
+  donations: number;
+  total: number;
+}
+
 export interface TaxCalculationResult {
   annualIncome: number;
   standardExpenseDeduction: number;
   personalDeduction: number;
+  totalOtherDeductions?: number;
+  otherDeductionsBreakdown?: OtherDeductionsBreakdown;
   totalInsuranceDeductionsBefore: number;
   totalInsuranceDeductionsAfter: number;
   netTaxableIncomeBefore: number;

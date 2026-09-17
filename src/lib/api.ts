@@ -302,10 +302,14 @@ export function computeLocalTaxCalculation(input: any): TaxCalculationResult {
     const combinedGeneralLife = Math.min(life + validHealth, 100000);
     const pensionCap = Math.min(annualIncome * 0.15, 200000);
     const validPension = Math.min(pension, pensionCap);
-    return combinedGeneralLife + validPension;
+    return {
+      combinedTotal: combinedGeneralLife + validPension,
+      validPension,
+      validGeneralLife: combinedGeneralLife,
+    };
   };
 
-  const deductionBefore = calcInsuranceDeduction(
+  const insBefore = calcInsuranceDeduction(
     Number(input.existingLifeInsurance || 0),
     Number(input.existingHealthInsurance || 0),
     Number(input.existingPension || 0)
@@ -315,10 +319,70 @@ export function computeLocalTaxCalculation(input: any): TaxCalculationResult {
   const totalHealth = Number(input.existingHealthInsurance || 0) + Number(input.proposedHealthInsurance || 0);
   const totalPension = Number(input.existingPension || 0) + Number(input.proposedPension || 0);
 
-  const deductionAfter = calcInsuranceDeduction(totalLife, totalHealth, totalPension);
+  const insAfter = calcInsuranceDeduction(totalLife, totalHealth, totalPension);
 
-  const netTaxableIncomeBefore = Math.max(0, annualIncome - standardExpenses - personalAllowance - deductionBefore);
-  const netTaxableIncomeAfter = Math.max(0, annualIncome - standardExpenses - personalAllowance - deductionAfter);
+  // Other Deductions
+  const other = input.otherDeductions;
+  let totalOtherBefore = 0;
+  let totalOtherAfter = 0;
+  let breakdown: any = undefined;
+
+  if (other) {
+    const socialSecurity = Math.min(Math.max(0, Number(other.socialSecurity || 0)), 9000);
+    const spouse = other.spouseAllowance ? 60000 : 0;
+    const children = Math.max(0, Number(other.childrenCount || 0)) * 30000;
+    const parents = Math.min(4, Math.max(0, Number(other.parentsCount || 0))) * 30000;
+    const disabledCare = Math.max(0, Number(other.disabledCareCount || 0)) * 60000;
+    const totalFamily = spouse + children + parents + disabledCare;
+    const mortgageInterest = Math.min(Math.max(0, Number(other.mortgageInterest || 0)), 100000);
+
+    const thaiEsg = Math.min(Math.max(0, Number(other.thaiEsg || 0)), Math.min(annualIncome * 0.30, 300000));
+
+    const rawRmf = Math.min(Math.max(0, Number(other.rmfPvdSsf || 0)), annualIncome * 0.30);
+    const rmfPvdBefore = Math.min(rawRmf, Math.max(0, 500000 - insBefore.validPension));
+    const rmfPvdAfter = Math.min(rawRmf, Math.max(0, 500000 - insAfter.validPension));
+
+    const easyEReceipt = Math.min(Math.max(0, Number(other.easyEReceipt || 0)), 50000);
+
+    const nonDonationOtherBefore = socialSecurity + totalFamily + mortgageInterest + thaiEsg + rmfPvdBefore + easyEReceipt;
+    const nonDonationOtherAfter = socialSecurity + totalFamily + mortgageInterest + thaiEsg + rmfPvdAfter + easyEReceipt;
+
+    const rawEdu = Math.max(0, Number(other.educationDonation || 0)) * 2;
+    const rawGen = Math.max(0, Number(other.generalDonation || 0));
+
+    const remBefore = Math.max(0, annualIncome - standardExpenses - personalAllowance - insBefore.combinedTotal - nonDonationOtherBefore);
+    const donationCapBefore = remBefore * 0.10;
+    const donationsBefore = Math.min(rawEdu + rawGen, donationCapBefore);
+
+    const remAfter = Math.max(0, annualIncome - standardExpenses - personalAllowance - insAfter.combinedTotal - nonDonationOtherAfter);
+    const donationCapAfter = remAfter * 0.10;
+    const donationsAfter = Math.min(rawEdu + rawGen, donationCapAfter);
+
+    totalOtherBefore = nonDonationOtherBefore + donationsBefore;
+    totalOtherAfter = nonDonationOtherAfter + donationsAfter;
+
+    breakdown = {
+      socialSecurity,
+      spouse,
+      children,
+      parents,
+      disabledCare,
+      totalFamily,
+      mortgageInterest,
+      thaiEsg,
+      rmfPvdSsf: rmfPvdAfter,
+      totalInvestments: thaiEsg + rmfPvdAfter,
+      easyEReceipt,
+      donations: donationsAfter,
+      total: totalOtherAfter,
+    };
+  }
+
+  const deductionBefore = insBefore.combinedTotal;
+  const deductionAfter = insAfter.combinedTotal;
+
+  const netTaxableIncomeBefore = Math.max(0, annualIncome - standardExpenses - personalAllowance - deductionBefore - totalOtherBefore);
+  const netTaxableIncomeAfter = Math.max(0, annualIncome - standardExpenses - personalAllowance - deductionAfter - totalOtherAfter);
 
   const calcProgressive = (taxable: number) => {
     let totalTax = 0;
@@ -349,6 +413,8 @@ export function computeLocalTaxCalculation(input: any): TaxCalculationResult {
     annualIncome,
     standardExpenseDeduction: Math.round(standardExpenses),
     personalDeduction: personalAllowance,
+    totalOtherDeductions: Math.round(totalOtherAfter),
+    otherDeductionsBreakdown: breakdown,
     totalInsuranceDeductionsBefore: Math.round(deductionBefore),
     totalInsuranceDeductionsAfter: Math.round(deductionAfter),
     netTaxableIncomeBefore: Math.round(netTaxableIncomeBefore),
