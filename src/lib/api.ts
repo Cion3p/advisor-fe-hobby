@@ -1343,15 +1343,50 @@ export async function fetchAnalyticsAPI() {
   }
 }
 
-export async function trackAnalyticsEventAPI(eventType: string, eventData: any = {}) {
+export interface TrackAnalyticsParams {
+  pagePath?: string;
+  pageTitle?: string;
+  referrer?: string;
+  visitorId?: string;
+  sessionId?: string;
+  deviceType?: string;
+  browser?: string;
+  consentStatus?: string;
+  eventData?: any;
+}
+
+export async function trackAnalyticsEventAPI(
+  eventType: string,
+  paramsOrEventData: TrackAnalyticsParams | any = {}
+) {
   try {
+    let payload: any = { eventType };
+
+    // Check if paramsOrEventData is TrackAnalyticsParams
+    if (
+      paramsOrEventData &&
+      typeof paramsOrEventData === 'object' &&
+      ('pagePath' in paramsOrEventData || 'visitorId' in paramsOrEventData || 'sessionId' in paramsOrEventData || 'consentStatus' in paramsOrEventData)
+    ) {
+      payload = {
+        eventType,
+        ...paramsOrEventData,
+      };
+    } else {
+      payload = {
+        eventType,
+        eventData: paramsOrEventData,
+      };
+    }
+
     await fetch(`${API_BASE_URL}/analytics/track`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ eventType, eventData }),
+      body: JSON.stringify(payload),
     });
   } catch {
-    // ignore
+    // ignore network errors
   }
 }
+
 

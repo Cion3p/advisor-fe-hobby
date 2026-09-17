@@ -13,16 +13,15 @@ import {
   Info
 } from 'lucide-react';
 import { trackAnalyticsEventAPI } from '@/lib/api';
+import { 
+  setCookieConsent, 
+  getCookieConsent, 
+  getClientAnalyticsContext, 
+  CookieConsentPreferences 
+} from '@/lib/cookieManager';
 
-export interface CookieConsentPreferences {
-  necessary: boolean;
-  analytics: boolean;
-  marketing: boolean;
-  timestamp: string;
-  status: 'all' | 'essential_only' | 'custom';
-}
+export type { CookieConsentPreferences };
 
-const STORAGE_KEY = 'modtanoy_cookie_consent';
 const STATS_KEY = 'modtanoy_cookie_stats';
 
 export function CookieConsentBanner() {
@@ -32,9 +31,9 @@ export function CookieConsentBanner() {
   const [marketingAllowed, setMarketingAllowed] = useState(true);
 
   useEffect(() => {
-    // Check if user has already given consent
+    // Check if user has already given consent via cookie or localStorage
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = getCookieConsent();
       if (!saved) {
         // Small delay for smooth entry after initial page paint
         const timer = setTimeout(() => {
@@ -43,7 +42,7 @@ export function CookieConsentBanner() {
         return () => clearTimeout(timer);
       }
     } catch {
-      // In case localStorage is blocked
+      // In case storage is blocked
     }
   }, []);
 
@@ -64,17 +63,26 @@ export function CookieConsentBanner() {
 
   const saveConsent = (prefs: CookieConsentPreferences) => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+      setCookieConsent(prefs);
       updateConsentStats(prefs.status);
-      window.dispatchEvent(new CustomEvent('modtanoy_cookie_consent_updated', { detail: prefs }));
 
-      // Track real event into MySQL backend
+      const context = getClientAnalyticsContext();
+      // Track real event into MySQL backend with visitor & session info
       const eventType = prefs.status === 'all' 
         ? 'COOKIE_ACCEPT_ALL' 
         : prefs.status === 'essential_only' 
         ? 'COOKIE_ESSENTIAL_ONLY' 
         : 'COOKIE_CUSTOM';
-      trackAnalyticsEventAPI(eventType, prefs);
+
+      trackAnalyticsEventAPI(eventType, {
+        visitorId: context.visitorId,
+        sessionId: context.sessionId,
+        pagePath: typeof window !== 'undefined' ? window.location.pathname : '/',
+        deviceType: context.deviceType,
+        browser: context.browser,
+        consentStatus: prefs.status,
+        eventData: prefs,
+      });
     } catch {
       // ignore
     }

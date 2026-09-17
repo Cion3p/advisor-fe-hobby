@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { Noto_Sans_Thai, Plus_Jakarta_Sans } from 'next/font/google';
+import { Suspense } from 'react';
 import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { CookieConsentBanner } from '@/components/common/CookieConsentBanner';
+import { AnalyticsRouteTracker } from '@/components/common/AnalyticsRouteTracker';
 
 const notoSansThai = Noto_Sans_Thai({
   subsets: ['thai', 'latin'],
@@ -84,6 +86,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans flex flex-col min-h-screen bg-slate-50 antialiased text-slate-800 selection:bg-brand-500 selection:text-white">
+        <Suspense fallback={null}>
+          <AnalyticsRouteTracker />
+        </Suspense>
         <Navbar />
         <main className="flex-grow">{children}</main>
         <Footer />
