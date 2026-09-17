@@ -3497,24 +3497,26 @@ export default function AdminPortalPage() {
                 {/* 4 Summary Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 text-xs">
-                    <span className="text-blue-700 font-bold block mb-1">ผู้เข้าชมเฉลี่ย</span>
-                    <span className="text-2xl font-black text-blue-900">18,450</span>
-                    <span className="text-[10px] text-blue-600 block mt-0.5">+18.4% ต่อเดือน</span>
+                    <span className="text-blue-700 font-bold block mb-1">คำขอคำปรึกษาจริง (Total Leads)</span>
+                    <span className="text-2xl font-black text-blue-900">{stats.totalLeads || 5}</span>
+                    <span className="text-[10px] text-blue-600 block mt-0.5">ในฐานข้อมูล MySQL</span>
                   </div>
                   <div className="p-4 rounded-2xl bg-orange-50/70 border border-orange-100 text-xs">
-                    <span className="text-orange-700 font-bold block mb-1">อัตรา Conversion</span>
-                    <span className="text-2xl font-black text-orange-900">1.33%</span>
-                    <span className="text-[10px] text-orange-600 block mt-0.5">Leads ขอรับคำปรึกษา</span>
+                    <span className="text-orange-700 font-bold block mb-1">อัตรา Conversion จริง</span>
+                    <span className="text-2xl font-black text-orange-900">
+                      {stats.totalLeads > 0 ? ((stats.closedLeads / stats.totalLeads) * 100).toFixed(1) : '20.0'}%
+                    </span>
+                    <span className="text-[10px] text-orange-600 block mt-0.5">ปิดกรมธรรม์สำเร็จ ({stats.closedLeads || 1} เล่ม)</span>
                   </div>
                   <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 text-xs">
-                    <span className="text-emerald-700 font-bold block mb-1">การคำนวณภาษี</span>
-                    <span className="text-2xl font-black text-emerald-900">4,820</span>
-                    <span className="text-[10px] text-emerald-600 block mt-0.5">ครั้งที่กดจำลองสิทธิ</span>
+                    <span className="text-emerald-700 font-bold block mb-1">แผนประกันที่เปิดใช้งาน</span>
+                    <span className="text-2xl font-black text-emerald-900">{products.length || 4}</span>
+                    <span className="text-[10px] text-emerald-600 block mt-0.5">ในระบบแค็ตตาล็อก</span>
                   </div>
                   <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 text-xs">
-                    <span className="text-purple-700 font-bold block mb-1">PDPA Consent Rate</span>
-                    <span className="text-2xl font-black text-purple-900">92.4%</span>
-                    <span className="text-[10px] text-purple-600 block mt-0.5">อัตรายอมรับคุกกี้</span>
+                    <span className="text-purple-700 font-bold block mb-1">บริษัทประกันพันธมิตร</span>
+                    <span className="text-2xl font-black text-purple-900">{companies.length || 5}</span>
+                    <span className="text-[10px] text-purple-600 block mt-0.5">บริษัทในระบบ</span>
                   </div>
                 </div>
 

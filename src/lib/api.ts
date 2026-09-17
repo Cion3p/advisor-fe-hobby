@@ -1327,3 +1327,31 @@ export function resetAnnouncementPopup(): AnnouncementPopup {
   }
   return DEFAULT_ANNOUNCEMENT_POPUP;
 }
+
+// ---------------------------------------------------------
+// REAL ANALYTICS API (MYSQL BACKEND)
+// ---------------------------------------------------------
+export async function fetchAnalyticsAPI() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/analytics`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch analytics');
+    const json = await res.json();
+    return json.data;
+  } catch (e) {
+    console.error('Failed to fetch analytics from backend', e);
+    return null;
+  }
+}
+
+export async function trackAnalyticsEventAPI(eventType: string, eventData: any = {}) {
+  try {
+    await fetch(`${API_BASE_URL}/analytics/track`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventType, eventData }),
+    });
+  } catch {
+    // ignore
+  }
+}
+

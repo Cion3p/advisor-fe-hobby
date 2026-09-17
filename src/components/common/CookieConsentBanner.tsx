@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Info
 } from 'lucide-react';
+import { trackAnalyticsEventAPI } from '@/lib/api';
 
 export interface CookieConsentPreferences {
   necessary: boolean;
@@ -66,6 +67,14 @@ export function CookieConsentBanner() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
       updateConsentStats(prefs.status);
       window.dispatchEvent(new CustomEvent('modtanoy_cookie_consent_updated', { detail: prefs }));
+
+      // Track real event into MySQL backend
+      const eventType = prefs.status === 'all' 
+        ? 'COOKIE_ACCEPT_ALL' 
+        : prefs.status === 'essential_only' 
+        ? 'COOKIE_ESSENTIAL_ONLY' 
+        : 'COOKIE_CUSTOM';
+      trackAnalyticsEventAPI(eventType, prefs);
     } catch {
       // ignore
     }
