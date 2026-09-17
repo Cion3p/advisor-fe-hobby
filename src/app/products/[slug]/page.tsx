@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { fetchProductBySlug, FALLBACK_PRODUCTS } from '@/lib/api';
 import { ProductJsonLd, FAQJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
+import { CompanyBrandBadge } from '@/components/common/CompanyBrandBadge';
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -124,6 +125,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <span className="text-xs font-semibold px-3 py-1 rounded-full bg-brand-50 text-brand-700 border border-brand-200">
                 {product.category_name}
               </span>
+              <CompanyBrandBadge
+                companyCode={product.company_code}
+                companyName={product.company_name}
+                variant="compact"
+              />
               {product.is_tax_deductible && (
                 <span className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <Receipt className="w-3.5 h-3.5" />
@@ -156,6 +162,13 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               </div>
             </div>
           </div>
+
+          {/* Insurer Company Full Showcase Banner */}
+          <CompanyBrandBadge
+            companyCode={product.company_code}
+            companyName={product.company_name}
+            variant="full"
+          />
 
           {/* Highlights */}
           <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-4">
@@ -260,6 +273,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </div>
 
             <div className="space-y-3 text-xs text-slate-600">
+              <div className="flex justify-between py-1 border-b border-slate-100 items-center">
+                <span className="text-slate-500">บริษัทผู้รับประกัน:</span>
+                <CompanyBrandBadge
+                  companyCode={product.company_code}
+                  companyName={product.company_name}
+                  variant="compact"
+                />
+              </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500">อายุรับประกัน:</span>
                 <span className="font-semibold text-slate-900">{product.min_entry_age} - {product.max_entry_age} ปี</span>

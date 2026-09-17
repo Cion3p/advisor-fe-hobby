@@ -16,13 +16,15 @@ import {
   BookOpen,
   Clock,
   User,
-  Calendar
+  Calendar,
+  Building2
 } from 'lucide-react';
 import { fetchProducts, fetchCategories, fetchArticles } from '@/lib/api';
 import { ProductCard } from '@/components/products/ProductCard';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { AnnouncementModal } from '@/components/home/AnnouncementModal';
 import { HomeArticlesSection } from '@/components/home/HomeArticlesSection';
+import { COMPANY_BRANDS } from '@/lib/companies';
 
 export default async function HomePage() {
   const [categories, products, articles] = await Promise.all([
@@ -69,7 +71,8 @@ export default async function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-xs font-bold text-sky-800">
-            <span>🛡️ แผนความคุ้มครองครบวงจร</span>
+            <Shield className="w-3.5 h-3.5 text-sky-600" />
+            <span>แผนความคุ้มครองครบวงจร</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             เลือกดูตามหมวดหมู่ความคุ้มครอง
@@ -88,7 +91,7 @@ export default async function HomePage() {
                 className="bg-white p-6 rounded-2xl border border-sky-100 hover:border-sky-300 hover:shadow-xl hover:shadow-sky-100/70 transition-all group flex flex-col justify-between"
               >
                 <div>
-                  <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-gradient-to-r group-hover:from-orange-500 group-hover:to-amber-500 group-hover:text-white transition-all shadow-2xs">
+                  <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-sky-600 group-hover:text-white transition-all shadow-2xs">
                     {category.slug === 'health-insurance' && <HeartPulse className="w-6 h-6" />}
                     {category.slug === 'life-protection' && <Shield className="w-6 h-6" />}
                     {category.slug === 'savings-insurance' && <PiggyBank className="w-6 h-6" />}
@@ -108,6 +111,53 @@ export default async function HomePage() {
               </Link>
             );
           })}
+        </div>
+      </section>
+
+      {/* 2.1 Insurer Partners Quick Filter Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8">
+        <div className="bg-white rounded-2xl border border-sky-100 p-5 sm:p-6 shadow-xs">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-sky-600" />
+                <span>พันธมิตรบริษัทประกันภัยชั้นนำ (Partner Insurers)</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                เลือกดูแผนความคุ้มครองเฉพาะของแต่ละบริษัทประกันชีวิตและสุขภาพ
+              </p>
+            </div>
+            <Link
+              href="/products"
+              className="text-xs font-bold text-sky-700 hover:text-orange-600 inline-flex items-center gap-1 transition-colors"
+            >
+              <span>ดูทุกบริษัท</span>
+              <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {Object.values(COMPANY_BRANDS).map((brand) => (
+              <Link
+                key={brand.code}
+                href={`/products?company=${brand.code}`}
+                className="group flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200/80 hover:border-sky-300 hover:shadow-md transition-all text-center bg-white"
+              >
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-xs tracking-tight shadow-2xs mb-2 group-hover:scale-105 transition-transform"
+                  style={{ backgroundColor: brand.brandColor }}
+                >
+                  {brand.code}
+                </div>
+                <span className="text-xs font-bold text-slate-900 group-hover:text-sky-700 transition-colors truncate w-full">
+                  {brand.name}
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5">
+                  สายด่วน {brand.phone}
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -138,9 +188,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. Interactive Calculators Banner (Deep Sky to Slate with Standout Orange CTA) */}
+      {/* 4. Interactive Calculators Banner (Deep Slate with Standout Solid Orange CTA) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-sky-950 via-sky-900 to-slate-900 rounded-3xl p-8 sm:p-12 text-white shadow-xl shadow-sky-950/20 relative overflow-hidden">
+        <div className="bg-slate-900 rounded-3xl p-8 sm:p-12 text-white shadow-xl shadow-slate-900/10 relative overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
             <div className="space-y-4">
               <span className="text-xs font-bold tracking-widest text-sky-300 uppercase">
@@ -150,7 +200,7 @@ export default async function HomePage() {
                 รู้ทันภาษีและทุนประกัน <br />
                 ด้วยโปรแกรมคำนวณอัจฉริยะ
               </h2>
-              <p className="text-sky-100 text-sm leading-relaxed">
+              <p className="text-slate-300 text-sm leading-relaxed">
                 ไม่แน่ใจว่าจะซื้อประกันเท่าไหร่ดีถึงจะลดหย่อนภาษีได้เต็มสิทธิ? หรือครอบครัวต้องการความคุ้มครองกี่บาทหากเกิดเหตุไม่คาดฝัน? ลองใช้โปรแกรมคำนวณของเราได้ฟรีทันที
               </p>
               
@@ -158,7 +208,7 @@ export default async function HomePage() {
               <div className="flex flex-wrap gap-3.5 pt-2">
                 <Link
                   href="/calculators/tax"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-orange-500/35 hover:scale-[1.03] active:scale-[0.98] transition-all"
+                  className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm px-6 py-3.5 rounded-xl shadow-md active:scale-[0.98] transition-all"
                 >
                   <Percent className="w-4 h-4 text-white" />
                   <span>คำนวณภาษี & ค่าลดหย่อน</span>
@@ -206,7 +256,8 @@ export default async function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-xs font-bold text-sky-800">
-            <span>✨ ขั้นตอนการทำงานที่โปร่งใส</span>
+            <Sparkles className="w-3.5 h-3.5 text-sky-600" />
+            <span>ขั้นตอนการทำงานที่โปร่งใส</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             ขั้นตอนการรับคำปรึกษาที่โปร่งใสใน 4 ขั้นตอน
@@ -247,8 +298,8 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-sky-200 shadow-xs hover:border-sky-400 bg-gradient-to-br from-white to-sky-50/50 transition-all text-center space-y-3">
-            <div className="w-12 h-12 mx-auto rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white flex items-center justify-center font-black text-lg shadow-sm">
+          <div className="bg-white p-6 rounded-2xl border border-sky-200 shadow-xs hover:border-sky-400 transition-all text-center space-y-3">
+            <div className="w-12 h-12 mx-auto rounded-full bg-sky-600 text-white flex items-center justify-center font-black text-lg shadow-sm">
               4
             </div>
             <h3 className="font-bold text-slate-900 text-base">พูดคุยกับผู้เชี่ยวชาญ</h3>
@@ -259,7 +310,7 @@ export default async function HomePage() {
         </div>
 
         {/* Bottom Big Standout CTA Banner */}
-        <div className="mt-12 bg-gradient-to-r from-sky-50 via-sky-100/60 to-blue-50 border border-sky-200/80 rounded-3xl p-8 sm:p-12 text-center space-y-4">
+        <div className="mt-12 bg-sky-50 border border-sky-200 rounded-3xl p-8 sm:p-12 text-center space-y-4">
           <h3 className="text-xl sm:text-2xl font-black text-slate-900">
             พร้อมเริ่มต้นวางแผนความคุ้มครองที่ตรงใจคุณหรือยัง?
           </h3>
@@ -269,9 +320,9 @@ export default async function HomePage() {
           <div className="pt-2">
             <Link
               href="/consultation"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-sm sm:text-base px-8 py-3.5 rounded-2xl shadow-xl shadow-orange-500/35 hover:scale-105 active:scale-[0.98] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm sm:text-base px-8 py-3.5 rounded-2xl shadow-md active:scale-[0.98] transition-all cursor-pointer"
             >
-              <PhoneCall className="w-4 h-4 text-white animate-bounce" />
+              <PhoneCall className="w-4 h-4 text-white" />
               <span>ลงทะเบียนขอรับคำปรึกษาฟรีทันที</span>
             </Link>
           </div>

@@ -217,6 +217,7 @@ export async function fetchCategories(): Promise<Category[]> {
 
 export async function fetchProducts(params: {
   category?: string;
+  company?: string;
   minAge?: number;
   maxBudget?: number;
   isTaxDeductible?: boolean;
@@ -225,19 +226,37 @@ export async function fetchProducts(params: {
   try {
     const query = new URLSearchParams();
     if (params.category) query.append('category', params.category);
+    if (params.company) query.append('company', params.company);
     if (params.minAge) query.append('minAge', params.minAge.toString());
     if (params.maxBudget) query.append('maxBudget', params.maxBudget.toString());
     if (params.isTaxDeductible !== undefined) query.append('isTaxDeductible', params.isTaxDeductible.toString());
     if (params.search) query.append('search', params.search);
 
-    const res = await fetch(`${API_BASE_URL}/products?${query.toString()}`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_BASE_URL}/products?${query.toString()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('API error');
     const json = await res.json();
-    return json.data || FALLBACK_PRODUCTS;
+    let data: Product[] = json.data || FALLBACK_PRODUCTS;
+    if (params.company) {
+      const comp = params.company.toUpperCase();
+      data = data.filter(
+        (p) =>
+          (p.company_code && p.company_code.toUpperCase().includes(comp)) ||
+          (p.company_name && p.company_name.toUpperCase().includes(comp))
+      );
+    }
+    return data;
   } catch {
     // Filter fallback
     let list = [...FALLBACK_PRODUCTS];
     if (params.category) list = list.filter((p) => p.category_slug === params.category);
+    if (params.company) {
+      const comp = params.company.toUpperCase();
+      list = list.filter(
+        (p) =>
+          (p.company_code && p.company_code.toUpperCase().includes(comp)) ||
+          (p.company_name && p.company_name.toUpperCase().includes(comp))
+      );
+    }
     if (params.minAge) list = list.filter((p) => p.min_entry_age <= params.minAge! && p.max_entry_age >= params.minAge!);
     if (params.maxBudget) list = list.filter((p) => p.min_premium <= params.maxBudget!);
     if (params.isTaxDeductible !== undefined) list = list.filter((p) => p.is_tax_deductible === params.isTaxDeductible);
@@ -749,6 +768,33 @@ export const FALLBACK_ARTICLES: Article[] = [
     category_name: 'ประกันสุขภาพเหมาจ่าย',
     category_slug: 'health-insurance',
     cover_image_url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=800&auto=format&fit=crop',
+    content: `## ทำไมต้องเป็น "ประกันสุขภาพแบบเหมาจ่าย"?
+
+ในอดีต ประกันสุขภาพส่วนใหญ่จะมีการจำกัดวงเงินค่ารักษาแบบ "แยกรายการ" เช่น ค่าห้องวันละไม่เกิน 3,000 บาท ค่าผ่าตัดไม่เกิน 30,000 บาท ซึ่งเมื่อค่ารักษาพยาบาลในโรงพยาบาลเอกชนปรับตัวสูงขึ้นอย่างต่อเนื่อง ผู้เอาประกันจึงมักต้องจ่าย "ส่วนต่าง" ก้อนโตด้วยตนเอง
+
+ประกันสุขภาพแบบ **"เหมาจ่าย"** จึงเข้ามาแก้ปัญหานี้ โดยรวมค่าผ่าตัด ค่ายา ค่าแพทย์ และค่ารักษาพยาบาลทั่วไปไว้ในวงเงินก้อนเดียวต่อรอบปีกรมธรรม์ ตั้งแต่ 1 ล้าน ไปจนถึง 100 ล้านบาท
+
+---
+
+## 5 จุดเช็กพอยต์สำคัญก่อนตัดสินใจเลือกแผน
+
+### 1. หมวดค่าห้อง (Room & Board) เป็นแบบใด?
+- **แบบจำกัดวงเงิน**: เช่น ให้ค่าห้องเดี่ยวไม่เกิน 5,000 บาท/วัน หากนอนโรงพยาบาลที่มีค่าห้อง 8,000 บาท เราจะต้องจ่ายส่วนต่าง 3,000 บาท/วัน
+- **แบบตามจริงห้องเดี่ยวมาตรฐาน**: แผนกลุ่มพรีเมียมส่วนใหญ่จะครอบคลุมค่าห้องเดี่ยวมาตรฐานของทุกโรงพยาบาลโดยไม่ต้องกังวลเรื่องส่วนต่าง
+
+### 2. วงเงินความคุ้มครองต่อปี และ ต่อครั้ง
+ควรเลือกรอบปีกรมธรรม์ที่ไม่ต่ำกว่า 5 - 20 ล้านบาท เพราะหากเกิดโรคร้ายแรง เช่น มะเร็ง โรคหลอดเลือดสมอง หรืออุบัติเหตุใหญ่ ค่ารักษาอาจพุ่งสูงถึงหลักล้านบาทในระยะเวลาอันสั้น
+
+### 3. คุ้มครองการรักษาแบบ Targeted Therapy และ Immunotherapy หรือไม่?
+การรักษามะเร็งในปัจจุบันพัฒนาไปไกลมาก ยามุ่งเป้า (Targeted Therapy) สามารถทำลายเฉพาะเซลล์มะเร็งได้โดยผลข้างเคียงต่ำ แต่มีค่าใช้จ่ายคอร์สละหลายแสนถึงหลายล้านบาท การเลือกแผนที่ครอบคลุมนวัตกรรมการรักษาเหล่านี้จึงคุ้มค่าอย่างยิ่ง
+
+### 4. ความรับผิดส่วนแรก (Deductible)
+หากคุณมีสวัสดิการบริษัทหรือประกันกลุ่มอยู่แล้ว สามารถเลือกแผนที่มี **Deductible (ความรับผิดส่วนแรก)** เช่น 20,000 - 50,000 บาทแรก เพื่อให้เบี้ยประกันถูกลงถึง 30-50% และใช้ประกันกลุ่มของบริษัทมาเคลมส่วนแรกแทน
+
+### 5. ระยะเวลารอคอย (Waiting Period)
+- โรคทั่วไป: 30 วัน
+- โรคเรื้อรัง/เนื้องอก/นิ่ว/ต้อกระจก: 90 - 120 วัน
+- โรคที่เป็นมาก่อนทำประกัน (Pre-existing condition) จะไม่ได้รับความคุ้มครอง ดังนั้นการทำประกันตั้งแต่ตอนสุขภาพยังแข็งแรงจึงเป็นทางเลือกที่ดีที่สุด`,
   },
   {
     id: 2,
@@ -762,6 +808,37 @@ export const FALLBACK_ARTICLES: Article[] = [
     category_name: 'ภาษีและการวางแผน',
     category_slug: 'tax-planning',
     cover_image_url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop',
+    content: `## วางแผนภาษีส่งท้ายปี: รู้จักเพดานลดหย่อนแต่ละกลุ่ม
+
+การลดหย่อนภาษีเงินได้บุคคลธรรมดาด้วยประกันและกองทุนรวม ไม่เพียงแต่ช่วยให้เราได้เงินคืนภาษี (Tax Refund) สูงสุดตามฐานภาษีเท่านั้น แต่ยังเป็นการสร้างความคุ้มครองชีวิต สุขภาพ และเงินเกษียณไปพร้อมๆ กัน
+
+---
+
+## สรุปเพดานลดหย่อนภาษีหมวดประกันภัย
+
+### 1. ประกันชีวิตทั่วไป & ประกันสะสมทรัพย์ (สูงสุด 100,000 บาท)
+- ต้องเป็นกรมธรรม์ที่มีระยะเวลาคุ้มครองตั้งแต่ **10 ปีขึ้นไป**
+- บริษัทประกันต้องดำเนินกิจการในประเทศไทย
+- หากมีเงินคืนระหว่างสัญญา ต้องไม่เกิน 20% ของเบี้ยสะสม
+
+### 2. ประกันสุขภาพของตนเอง (สูงสุด 25,000 บาท)
+- สามารถนำมาหักลดหย่อนได้ตามที่จ่ายจริง สูงสุด 25,000 บาท
+- **หมายเหตุ**: เมื่อรวมกับประกันชีวิตทั่วไปในข้อ 1 แล้ว **ต้องไม่เกิน 100,000 บาท**
+
+### 3. ประกันสุขภาพบิดามารดา (สูงสุด 16,000 บาท)
+- บิดามารดาของผู้มีเงินได้หรือคู่สมรส มีรายได้ไม่เกิน 30,000 บาทต่อปี
+
+### 4. ประกันชีวิตแบบบำนาญ (Annuity) (สูงสุด 200,000 บาท)
+- ลดหย่อนได้ 15% ของเงินได้พึงประเมิน สูงสุดไม่เกิน 200,000 บาท
+- ต้องคุ้มครองถึงอายุ 85 ปีขึ้นไป และจ่ายผลประโยชน์บำนาญสม่ำเสมอ
+- เมื่อรวมกับกองทุนสำรองเลี้ยงชีพ (PVD), กองทุนบำเหน็จบำนาญข้าราชการ (กบข.), RMF และ SSF/ThaiESG ต้องไม่เกิน 500,000 บาท
+
+---
+
+## ตารางประหยัดภาษีตามฐานเงินได้
+- ฐานภาษี 10%: ลดหย่อน 100,000 บาท ได้เงินคืน **10,000 บาท**
+- ฐานภาษี 20%: ลดหย่อน 100,000 บาท ได้เงินคืน **20,000 บาท**
+- ฐานภาษี 35%: ลดหย่อน 100,000 บาท ได้เงินคืน **35,000 บาท**`,
   },
   {
     id: 3,
@@ -775,6 +852,26 @@ export const FALLBACK_ARTICLES: Article[] = [
     category_name: 'วางแผนเกษียณ & มรดก',
     category_slug: 'life-pension',
     cover_image_url: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=800&auto=format&fit=crop',
+    content: `## วัย 30+ จุดเปลี่ยนสำคัญของการวางแผนการเงิน
+
+เมื่อก้าวเข้าสู่วัยทำงาน 30 ปีขึ้นไป ภาระหน้าที่และความรับผิดชอบมักเพิ่มขึ้น ทั้งครอบครัว บุตร และแผนชีวิตระยะยาว คำถามยอดฮิตคือ: **เราควรเลือกทำประกันชีวิตทั่วไป หรือ ประกันบำนาญก่อนดี?**
+
+---
+
+## ความแตกต่างหลักระหว่าง 2 รูปแบบ
+
+| จุดเด่น | ประกันชีวิตทั่วไป (Whole Life / Term) | ประกันบำนาญ (Annuity) |
+| :--- | :--- | :--- |
+| **วัตถุประสงค์หลัก** | คุ้มครองผู้ที่อยู่ข้างหลัง (สร้างมรดก) | การันตีรายได้หลังเกษียณให้ตนเอง |
+| **ช่วงเวลารับเงิน** | เมื่อผู้เอาประกันเสียชีวิต | ทุกปีตั้งแต่อายุ 55/60 จนถึง 85-99 ปี |
+| **สิทธิลดหย่อนภาษี** | ก้อน 100,000 บาทแรก | ก้อน 200,000 บาทส่วนบำนาญ |
+| **ความเหมาะสม** | เสาหลักของครอบครัว มีคนพึ่งพิง | วางแผนหยุดทำงาน มีเงินกินเงินใช้แน่นอน |
+
+---
+
+## คำแนะนำการจัดสัดส่วนพอร์ตประกัน
+1. **หากเป็นเสาหลักคนเดียวของบ้าน**: เริ่มต้นด้วยประกันชีวิตแบบตลอดชีพหรือชั่วระยะเวลา เพื่อให้มีทุนประกันอย่างน้อย 5 เท่าของรายได้ต่อปี
+2. **หากมีประกันชีวิตพื้นฐานพอแล้ว**: เริ่มสะสมประกันบำนาญเพื่อล็อคกระแสเงินสดวัยเกษียณที่ไม่มีความเสี่ยง พร้อมใช้สิทธิลดหย่อนภาษีเต็มเพดาน`,
   },
 ];
 
@@ -819,13 +916,26 @@ export async function fetchArticles(): Promise<Article[]> {
   }
 }
 
+export async function fetchArticleBySlug(slug: string): Promise<Article | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/articles/${slug}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch article');
+    const json = await res.json();
+    return json.data || null;
+  } catch {
+    const all = typeof window !== 'undefined' ? getArticles() : FALLBACK_ARTICLES;
+    const found = all.find((a) => a.slug === slug);
+    return found || null;
+  }
+}
+
 // ---------------------------------------------------------
 // ANNOUNCEMENT POPUP BANNER
 // ---------------------------------------------------------
 export const DEFAULT_ANNOUNCEMENT_POPUP: AnnouncementPopup = {
   id: 'announcement-tax-2026',
   is_active: true,
-  badge_text: 'แคมเปญพิเศษส่งท้ายปี 🔥',
+  badge_text: 'แคมเปญพิเศษส่งท้ายปี',
   title: 'วางแผนลดหย่อนภาษี & สุขภาพเหมาจ่าย 2567',
   subtitle: 'รับสิทธิ์คำนวณภาษีรายบุคคลและตารางเปรียบเทียบแผนสุขภาพฟรี! มีจำนวนจำกัดสำหรับผู้ลงทะเบียนวันนี้',
   image_url: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1200&auto=format&fit=crop',

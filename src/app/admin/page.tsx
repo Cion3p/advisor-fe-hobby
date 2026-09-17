@@ -46,7 +46,8 @@ import {
   Info,
   BookOpen,
   Megaphone,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Star
 } from 'lucide-react';
 import { 
   fetchLeadsAPI, 
@@ -71,6 +72,7 @@ import {
 } from '@/lib/api';
 import { Product, HeroSlide, Article, AnnouncementPopup } from '@/types';
 import { ImageUploadPicker } from '@/components/common/ImageUploadPicker';
+import { CompanyBrandBadge } from '@/components/common/CompanyBrandBadge';
 
 // Admin Session Type
 interface AdminUser {
@@ -281,7 +283,7 @@ export default function AdminPortalPage() {
           name: 'คุณชนุดม รัตนรักษ์',
           role: 'ผู้ดูแลระบบและที่ปรึกษาอาวุโส (Super Admin)',
           email: email || 'admin@modtanoy.com',
-          avatar: '👨‍💼',
+          avatar: 'CR',
           loginTime: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
         };
 
@@ -663,17 +665,13 @@ export default function AdminPortalPage() {
   // ----------------------------------------------------------------------
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-100 via-sky-50/60 to-white flex items-center justify-center p-4 sm:p-6 font-sans relative overflow-hidden">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6 font-sans relative overflow-hidden">
         
-        {/* Floating background decorative blur */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-200/50 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-100/60 rounded-full blur-3xl pointer-events-none"></div>
-
         <div className="max-w-md w-full relative z-10 space-y-6">
           
           {/* Logo & Portal Header */}
           <div className="text-center space-y-3">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-600 to-blue-600 text-white shadow-xl shadow-sky-500/25 mb-1">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sky-600 text-white shadow-md mb-1">
               <ShieldCheck className="w-8 h-8" />
             </div>
             
@@ -776,7 +774,7 @@ export default function AdminPortalPage() {
               <button
                 type="submit"
                 disabled={isLoggingIn}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-orange-500/35 hover:shadow-xl hover:shadow-orange-500/45 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-75"
+                className="w-full py-3.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-75"
               >
                 {isLoggingIn ? (
                   <>
@@ -862,17 +860,12 @@ export default function AdminPortalPage() {
         <div>
           <div className="p-5 border-b border-slate-800 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-600 to-brand-600 flex items-center justify-center text-white shadow-md shadow-orange-500/20">
+              <div className="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center text-white shadow-sm shrink-0">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <div>
-                <div className="flex items-center gap-1">
-                  <span className="text-lg font-black text-white tracking-tight">Modtanoy</span>
-                  <span className="text-xs font-bold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">PRO</span>
-                </div>
-                <span className="text-[10px] text-slate-400 block">
-                  Enterprise Backoffice CRM
-                </span>
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-black text-white tracking-tight">Modtanoy<span className="text-sky-400">Admin</span></span>
+                <span className="text-[10px] font-bold text-sky-400 bg-sky-400/10 px-1.5 py-0.5 rounded border border-sky-400/20">PRO</span>
               </div>
             </Link>
 
@@ -1041,8 +1034,8 @@ export default function AdminPortalPage() {
         {/* Bottom User Profile Section */}
         <div className="p-4 border-t border-slate-800 space-y-3 bg-slate-950/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-lg">
-              {adminUser?.avatar || '👨‍💼'}
+            <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 shrink-0">
+              <User className="w-5 h-5" />
             </div>
             <div className="overflow-hidden">
               <div className="font-bold text-xs text-white truncate">
@@ -1140,7 +1133,7 @@ export default function AdminPortalPage() {
                 </button>
                 <button
                   onClick={() => setShowAddSlideModal(true)}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white transition-all shadow-md shadow-orange-600/20 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-orange-600 hover:bg-orange-700 text-white transition-all shadow-xs cursor-pointer"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>เพิ่มสไลด์ใหม่</span>
@@ -1160,7 +1153,7 @@ export default function AdminPortalPage() {
                 </button>
                 <button
                   onClick={() => setShowAddArticleModal(true)}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white transition-all shadow-md shadow-orange-600/20 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-orange-600 hover:bg-orange-700 text-white transition-all shadow-xs cursor-pointer"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>เขียนบทความใหม่</span>
@@ -1224,11 +1217,11 @@ export default function AdminPortalPage() {
             <div className="space-y-6">
               
               {/* Top Banner Notice */}
-              <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-brand-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2 max-w-2xl">
                   <div className="inline-flex items-center gap-2 text-xs font-bold px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30">
-                    <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span>
-                    ระบบพร้อมปฏิบัติการ • ตัวแทนประจำการ 5 ท่าน
+                    <span className="w-2 h-2 rounded-full bg-orange-400"></span>
+                    <span>ระบบพร้อมปฏิบัติการ • ตัวแทนประจำการ 5 ท่าน</span>
                   </div>
                   <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
                     ยินดีต้อนรับ, {adminUser?.name || 'คุณชนุดม'}
@@ -1241,7 +1234,7 @@ export default function AdminPortalPage() {
                 <div className="flex flex-wrap items-center gap-3">
                   <button
                     onClick={() => setActiveTab('leads')}
-                    className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-lg shadow-orange-600/30 transition-all cursor-pointer"
+                    className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-xs transition-all cursor-pointer"
                   >
                     <Users className="w-4 h-4" />
                     <span>จัดการลูกค้ามุ่งหวังทันที</span>
@@ -1253,7 +1246,7 @@ export default function AdminPortalPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 
                 {/* Total Leads */}
-                <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-2">
+                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-2">
                   <div className="flex items-center justify-between text-slate-500 text-xs font-bold">
                     <span>คำขอคำปรึกษาทั้งหมด</span>
                     <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">
@@ -1270,49 +1263,50 @@ export default function AdminPortalPage() {
                 </div>
 
                 {/* New Pending Leads */}
-                <div className="bg-white p-5 rounded-3xl border border-amber-200 shadow-xs space-y-2 bg-gradient-to-br from-white to-amber-50/50">
+                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-2">
                   <div className="flex items-center justify-between text-amber-900 text-xs font-bold">
                     <span>รอดำเนินการติดต่อ (NEW)</span>
-                    <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-amber-700 border border-amber-200">
                       <AlertCircle className="w-4 h-4" />
                     </div>
                   </div>
-                  <div className="text-3xl font-black text-amber-950 tracking-tight">
+                  <div className="text-3xl font-black text-slate-900 tracking-tight">
                     {stats.newLeads}
                   </div>
-                  <p className="text-[11px] text-amber-700 font-medium">
-                    ⚡ รอตัวแทนตอบกลับภายใน 24 ชม.
+                  <p className="text-[11px] text-amber-700 font-medium flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-amber-600" />
+                    <span>รอตัวแทนตอบกลับภายใน 24 ชม.</span>
                   </p>
                 </div>
 
                 {/* In Consultation */}
-                <div className="bg-white p-5 rounded-3xl border border-purple-200 shadow-xs space-y-2 bg-gradient-to-br from-white to-purple-50/50">
-                  <div className="flex items-center justify-between text-purple-900 text-xs font-bold">
+                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between text-slate-700 text-xs font-bold">
                     <span>อยู่ระหว่างนำเสนอแผน</span>
-                    <div className="w-8 h-8 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700">
+                    <div className="w-8 h-8 rounded-xl bg-sky-50 flex items-center justify-center text-sky-700 border border-sky-200">
                       <Clock className="w-4 h-4" />
                     </div>
                   </div>
-                  <div className="text-3xl font-black text-purple-950 tracking-tight">
+                  <div className="text-3xl font-black text-slate-900 tracking-tight">
                     {stats.consultingLeads + stats.contactedLeads}
                   </div>
-                  <p className="text-[11px] text-purple-700 font-medium">
+                  <p className="text-[11px] text-slate-500 font-medium">
                     ส่งตารางและเปรียบเทียบข้อเสนอ
                   </p>
                 </div>
 
                 {/* Active Products */}
-                <div className="bg-white p-5 rounded-3xl border border-emerald-200 shadow-xs space-y-2 bg-gradient-to-br from-white to-emerald-50/50">
-                  <div className="flex items-center justify-between text-emerald-900 text-xs font-bold">
+                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between text-slate-700 text-xs font-bold">
                     <span>แผนประกันที่เปิดใช้งาน</span>
-                    <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
+                    <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 border border-slate-200">
                       <Layers className="w-4 h-4" />
                     </div>
                   </div>
-                  <div className="text-3xl font-black text-emerald-950 tracking-tight">
+                  <div className="text-3xl font-black text-slate-900 tracking-tight">
                     {products.length}
                   </div>
-                  <p className="text-[11px] text-emerald-700 font-medium">
+                  <p className="text-[11px] text-slate-500 font-medium">
                     จาก 5 พันธมิตรประกันชีวิตชั้นนำ
                   </p>
                 </div>
@@ -1740,8 +1734,12 @@ export default function AdminPortalPage() {
                           <div className="text-[11px] text-slate-400 mt-0.5">รหัส: <code className="text-slate-600">{prod.code}</code></div>
                         </td>
 
-                        <td className="py-4 px-4 text-slate-700 font-semibold">
-                          {prod.company_name || 'บริษัทประกัน'}
+                        <td className="py-4 px-4">
+                          <CompanyBrandBadge 
+                            companyCode={prod.company_code} 
+                            companyName={prod.company_name} 
+                            variant="compact" 
+                          />
                         </td>
 
                         <td className="py-4 px-4">
@@ -1767,8 +1765,9 @@ export default function AdminPortalPage() {
 
                         <td className="py-4 px-4 text-center">
                           {prod.is_featured ? (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
-                              ⭐ แนะนำหน้าแรก
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                              <Star className="w-3 h-3 text-orange-500 fill-orange-500" />
+                              <span>แนะนำหน้าแรก</span>
                             </span>
                           ) : (
                             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
@@ -1837,7 +1836,7 @@ export default function AdminPortalPage() {
 
                     <button
                       onClick={() => setShowAddSlideModal(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white transition-all shadow-md shadow-orange-500/25 hover:shadow-lg hover:shadow-orange-500/35 cursor-pointer"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-orange-600 hover:bg-orange-700 text-white transition-all shadow-xs cursor-pointer"
                     >
                       <PlusCircle className="w-4 h-4 text-white" />
                       <span>เพิ่มสไลด์ใหม่</span>
@@ -1997,7 +1996,7 @@ export default function AdminPortalPage() {
                       <div className="lg:w-80 shrink-0 space-y-4">
                         
                         {/* Realistic Mockup of the Floating Banner Card */}
-                        <div className="bg-gradient-to-br from-white via-sky-50/40 to-sky-100/30 rounded-2xl border border-sky-200/80 p-4 shadow-sm space-y-3 relative overflow-hidden">
+                        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3 relative overflow-hidden">
                           <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
                             <span>พรีวิวการ์ดจำลอง</span>
                             <span className="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold text-[9px]">
@@ -2116,7 +2115,7 @@ export default function AdminPortalPage() {
 
                     <button
                       onClick={() => setShowAddArticleModal(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white transition-all shadow-md shadow-orange-500/25 hover:shadow-lg hover:shadow-orange-500/35 cursor-pointer"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-orange-600 hover:bg-orange-700 text-white transition-all shadow-xs cursor-pointer"
                     >
                       <PlusCircle className="w-4 h-4 text-white" />
                       <span>เขียนบทความใหม่</span>
@@ -2181,8 +2180,9 @@ export default function AdminPortalPage() {
                           <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-lg bg-white/95 text-sky-950 text-[10px] font-bold shadow-xs">
                             {article.category_name || 'ทั่วไป'}
                           </span>
-                          <span className="absolute bottom-2 right-2.5 text-[10px] text-white bg-black/50 px-2 py-0.5 rounded backdrop-blur-xs">
-                            ⏱️ {article.reading_time_minutes} นาที
+                          <span className="absolute bottom-2 right-2.5 text-[10px] text-white bg-black/50 px-2 py-0.5 rounded backdrop-blur-xs flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5 text-sky-400" />
+                            <span>{article.reading_time_minutes} นาที</span>
                           </span>
                         </div>
                       ) : (
@@ -2304,9 +2304,9 @@ export default function AdminPortalPage() {
                     : 'bg-slate-100 border-slate-200 text-slate-600'
                 }`}>
                   <div className="flex items-center gap-3">
-                    <span className={`w-3 h-3 rounded-full ${editingAnnouncement.is_active ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
+                    <span className={`w-2.5 h-2.5 rounded-full ${editingAnnouncement.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
                     <span className="text-xs font-bold">
-                      สถานะปัจจุบัน: {editingAnnouncement.is_active ? '🟢 กำลังเปิดแสดงผลบนหน้าแรก (Active)' : '⚪ ปิดการแสดงผลอยู่ (Hidden)'}
+                      สถานะปัจจุบัน: {editingAnnouncement.is_active ? 'กำลังเปิดแสดงผลบนหน้าแรก (Active)' : 'ปิดการแสดงผลอยู่ (Hidden)'}
                     </span>
                   </div>
                   <span className="text-[11px] text-slate-500">
@@ -2345,7 +2345,7 @@ export default function AdminPortalPage() {
                           required
                           value={editingAnnouncement.badge_text || ''}
                           onChange={(e) => setEditingAnnouncement({ ...editingAnnouncement, badge_text: e.target.value })}
-                          placeholder="เช่น แคมเปญพิเศษส่งท้ายปี 🔥"
+                          placeholder="เช่น แคมเปญพิเศษส่งท้ายปี"
                           className="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:border-orange-500 bg-white"
                         />
                       </div>
@@ -2461,7 +2461,7 @@ export default function AdminPortalPage() {
                       </button>
                       <button
                         type="submit"
-                        className="px-6 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 rounded-xl shadow-md shadow-orange-500/30 cursor-pointer"
+                        className="px-6 py-2.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-xl shadow-xs cursor-pointer"
                       >
                         บันทึกการตั้งค่าป๊อปอัป
                       </button>
@@ -2500,8 +2500,9 @@ export default function AdminPortalPage() {
                           </div>
 
                           {editingAnnouncement.show_countdown && (
-                            <div className="absolute bottom-2 left-2.5 text-[10px] text-amber-300 font-bold bg-black/60 px-2 py-0.5 rounded backdrop-blur-xs">
-                              ⏳ สิทธิพิเศษถึง: {editingAnnouncement.countdown_end_date}
+                            <div className="absolute bottom-2 left-2.5 text-[10px] text-amber-300 font-bold bg-black/60 px-2 py-0.5 rounded backdrop-blur-xs flex items-center gap-1">
+                              <Clock className="w-2.5 h-2.5 text-amber-300" />
+                              <span>สิทธิพิเศษถึง: {editingAnnouncement.countdown_end_date}</span>
                             </div>
                           )}
                         </div>
@@ -2518,7 +2519,7 @@ export default function AdminPortalPage() {
                         </div>
 
                         <div className="space-y-1.5 pt-1">
-                          <div className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold text-xs text-center shadow-xs">
+                          <div className="w-full py-2.5 px-4 rounded-xl bg-orange-600 text-white font-bold text-xs text-center shadow-xs">
                             {editingAnnouncement.primary_btn_label || 'ปุ่มกดหลัก'}
                           </div>
                           {editingAnnouncement.secondary_btn_label && (
@@ -2529,7 +2530,7 @@ export default function AdminPortalPage() {
                         </div>
 
                         <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-                          <span>✓ ไม่ต้องแสดงอีกในวันนี้</span>
+                          <span>ไม่ต้องแสดงอีกในวันนี้</span>
                           <span>ปิด</span>
                         </div>
                       </div>
@@ -2537,8 +2538,9 @@ export default function AdminPortalPage() {
                     </div>
                   </div>
 
-                  <p className="text-[11px] text-slate-400 italic text-center">
-                    💡 รูปแบบและสีสันนี้จะแสดงทันทีเมื่อผู้ใช้งานเปิดหน้าเว็บ ModtanoyAdvisor
+                  <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1">
+                    <Info className="w-3.5 h-3.5 text-slate-400" />
+                    <span>รูปแบบและสีสันนี้จะแสดงทันทีเมื่อผู้ใช้งานเปิดหน้าเว็บ ModtanoyAdvisor</span>
                   </p>
                 </div>
 
@@ -2791,6 +2793,7 @@ export default function AdminPortalPage() {
                     <option value={3}>อลิอันซ์ อยุธยา (AZAY)</option>
                     <option value={4}>กรุงไทย-แอกซ่า (KTAXA)</option>
                     <option value={5}>เอฟดับบลิวดี (FWD)</option>
+                    <option value={6}>กรุงเทพประกันชีวิต (BLA)</option>
                   </select>
                 </div>
               </div>
@@ -3465,7 +3468,7 @@ export default function AdminPortalPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 rounded-xl shadow-md shadow-orange-500/30 cursor-pointer"
+                  className="px-6 py-2.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-xl shadow-xs cursor-pointer"
                 >
                   บันทึกสไลด์ใหม่
                 </button>
@@ -3763,7 +3766,7 @@ export default function AdminPortalPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 rounded-xl shadow-md shadow-orange-500/30 cursor-pointer"
+                  className="px-6 py-2.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-xl shadow-xs cursor-pointer"
                 >
                   บันทึกการแก้ไขสไลด์
                 </button>
@@ -3949,7 +3952,7 @@ export default function AdminPortalPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 rounded-xl shadow-md shadow-orange-500/30 cursor-pointer"
+                  className="px-6 py-2.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-xl shadow-xs cursor-pointer"
                 >
                   เผยแพร่บทความใหม่
                 </button>
@@ -4127,7 +4130,7 @@ export default function AdminPortalPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 rounded-xl shadow-md shadow-orange-500/30 cursor-pointer"
+                  className="px-6 py-2.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-xl shadow-xs cursor-pointer"
                 >
                   บันทึกการแก้ไขบทความ
                 </button>

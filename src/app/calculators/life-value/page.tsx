@@ -176,7 +176,7 @@ export default function LifeValueCalculatorPage() {
 
         {/* Results Panel (5 cols) */}
         <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-28">
-          <div className="bg-gradient-to-br from-brand-900 to-slate-900 text-white p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
+          <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
             <div className="border-b border-white/10 pb-4">
               <span className="text-xs text-brand-300 font-semibold uppercase tracking-wider block">
                 ทุนประกันชีวิตที่แนะนำให้ทำเพิ่ม

@@ -124,7 +124,7 @@ export function AnnouncementModal() {
             )}
           </div>
         ) : (
-          <div className="bg-gradient-to-r from-sky-600 via-sky-500 to-blue-600 p-6 text-white text-center space-y-1">
+          <div className="bg-sky-700 p-6 text-white text-center space-y-1">
             <span className="text-xs font-bold uppercase tracking-wider text-sky-100">
               {popup.badge_text || 'ข่าวสารและสิทธิประโยชน์'}
             </span>
@@ -149,7 +149,7 @@ export function AnnouncementModal() {
             <Link
               href={popup.primary_btn_href || '#contact-form'}
               onClick={handleClose}
-              className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-orange-500/35 hover:shadow-xl hover:shadow-orange-500/45 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="w-full py-3.5 px-6 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer"
             >
               <span>{popup.primary_btn_label || 'รับสิทธิพิเศษทันที'}</span>
               <ArrowRight className="w-4 h-4" />

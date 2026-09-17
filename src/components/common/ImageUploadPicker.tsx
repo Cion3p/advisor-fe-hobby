@@ -330,11 +330,11 @@ export function ImageUploadPicker({
           <div className="flex flex-wrap gap-1.5">
             {[
               { id: 'all', label: 'ทั้งหมด' },
-              { id: 'health', label: '🏥 ประกันสุขภาพ' },
-              { id: 'finance', label: '📊 ภาษี & การเงิน' },
-              { id: 'family', label: '👨‍👩‍👦 ครอบครัว & มรดก' },
-              { id: 'promo', label: '📢 แคมเปญ & ประกาศ' },
-              { id: 'abstract', label: '🎨 ลายพาสเทล' },
+              { id: 'health', label: 'ประกันสุขภาพ' },
+              { id: 'finance', label: 'ภาษี & การเงิน' },
+              { id: 'family', label: 'ครอบครัว & มรดก' },
+              { id: 'promo', label: 'แคมเปญ & ประกาศ' },
+              { id: 'abstract', label: 'ลายพาสเทล' },
             ].map((cat) => (
               <button
                 key={cat.id}
@@ -405,7 +405,7 @@ export function ImageUploadPicker({
           <button
             type="submit"
             disabled={!urlInput.trim()}
-            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold rounded-xl text-xs shadow-xs hover:shadow transition-all disabled:opacity-50 cursor-pointer"
+            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs shadow-xs transition-all disabled:opacity-50 cursor-pointer"
           >
             ใช้งานรูปนี้
           </button>

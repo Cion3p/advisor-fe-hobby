@@ -130,27 +130,21 @@ export function HeroSlider() {
 
   return (
     <section 
-      className="relative overflow-hidden bg-gradient-to-b from-sky-100/70 via-sky-50/50 to-white pt-8 pb-14 sm:pt-12 sm:pb-20 border-b border-sky-100 select-none"
+      className="relative overflow-hidden bg-sky-50/60 pt-8 pb-14 sm:pt-12 sm:pb-20 border-b border-sky-100 select-none"
       onMouseEnter={() => setIsAutoPlay(false)}
       onMouseLeave={() => setIsAutoPlay(true)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Decorative Pastel Background Glows */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-sky-200/40 rounded-full blur-3xl pointer-events-none -translate-y-1/2"></div>
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-100/60 rounded-full blur-3xl pointer-events-none translate-y-1/2"></div>
-
-      {/* Dynamic Slide Background Image with Elegant Pastel Blur Overlay */}
+      {/* Dynamic Slide Background Image with Clean Overlay */}
       {slide.background_image && (
         <div 
           key={slide.id + (slide.background_image || '')}
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out opacity-25 pointer-events-none"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out opacity-20 pointer-events-none"
           style={{ backgroundImage: `url(${slide.background_image})` }}
         >
-          {/* Glassmorphism gradient overlay to guarantee perfect text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-sky-50/95 via-sky-50/85 to-white/70 backdrop-blur-[1px]"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-sky-100/40"></div>
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-xs"></div>
         </div>
       )}
 
@@ -164,12 +158,12 @@ export function HeroSlider() {
             
             {/* Top Brand Pill & Dynamic Slide Badge */}
             <div className="flex flex-wrap items-center gap-2.5">
-              <div className="inline-flex items-center gap-2 bg-white/95 border border-sky-200 text-sky-950 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-xs">
-                <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
-                ModtanoyAdvisor • มดตะนอย แอดไวเซอร์
+              <div className="inline-flex items-center gap-2 bg-white border border-sky-200 text-sky-950 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-sky-500"></span>
+                <span>ModtanoyAdvisor • มดตะนอย แอดไวเซอร์</span>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 bg-sky-50/90 border border-sky-200 text-sky-800 text-xs font-semibold px-3 py-1 rounded-full shadow-2xs">
+              <div className="inline-flex items-center gap-1.5 bg-white border border-sky-200 text-sky-800 text-xs font-semibold px-3 py-1 rounded-full shadow-2xs">
                 {renderBadgeIcon(slide.badge_icon)}
                 <span>{slide.badge_text}</span>
               </div>
@@ -179,7 +173,7 @@ export function HeroSlider() {
             <div className="space-y-2">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight transition-all duration-300">
                 {slide.title} <br />
-                <span className="bg-gradient-to-r from-sky-700 via-blue-700 to-slate-900 bg-clip-text text-transparent">
+                <span className="text-sky-700">
                   {slide.title_highlight}
                 </span>
               </h1>
@@ -200,21 +194,21 @@ export function HeroSlider() {
               ))}
             </div>
 
-            {/* Standout Action Buttons (High-contrast against pastel blue & white) */}
+            {/* Standout Action Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-3">
-              {/* PRIMARY STANDOUT BUTTON: Vibrant Warm Sunset Gradient */}
+              {/* PRIMARY STANDOUT BUTTON: Solid Warm Orange */}
               <Link
                 href={slide.primary_btn_href || '/products'}
-                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-sm px-7 py-3.5 rounded-xl shadow-lg shadow-orange-500/35 hover:shadow-xl hover:shadow-orange-500/45 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm px-7 py-3.5 rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
               >
                 <span>{slide.primary_btn_label || 'ดูรายละเอียด'}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 
-              {/* SECONDARY BUTTON: Crisp white with dark border for distinct readability */}
+              {/* SECONDARY BUTTON: Crisp white with border */}
               <Link
                 href={slide.secondary_btn_href || '/consultation'}
-                className="inline-flex items-center justify-center gap-2 bg-white hover:bg-orange-50/40 text-slate-800 hover:text-orange-600 font-bold text-sm px-6 py-3.5 rounded-xl border-2 border-slate-200 hover:border-orange-500 shadow-xs hover:shadow-md transition-all active:scale-[0.98] cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 font-bold text-sm px-6 py-3.5 rounded-xl border border-slate-300 shadow-xs transition-all active:scale-[0.98] cursor-pointer"
               >
                 <PhoneCall className="w-4 h-4 text-slate-600" />
                 <span>{slide.secondary_btn_label || 'ปรึกษาตัวแทนฟรี'}</span>
@@ -223,21 +217,21 @@ export function HeroSlider() {
 
           </div>
 
-          {/* Right Column: Clean White & Pastel Highlight Card (5 cols) */}
+          {/* Right Column: Clean White Highlight Card (5 cols) */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-7 shadow-xl shadow-sky-100/80 border border-sky-100 relative overflow-hidden transition-all duration-300 hover:shadow-2xl">
+            <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-7 shadow-lg shadow-slate-200/60 border border-slate-200 relative overflow-hidden transition-all duration-300 hover:shadow-xl">
               
-              {/* Card top pastel highlight bar */}
-              <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-sky-400 via-sky-500 to-blue-600"></div>
+              {/* Card top accent bar */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-sky-600"></div>
 
               {/* Card Header */}
-              <div className="flex items-center justify-between gap-2 pb-4 border-b border-sky-50">
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full bg-sky-950 text-white tracking-wider">
+              <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-900 text-white tracking-wider">
                   <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
                   {slide.card_badge || 'FEATURED'}
                 </span>
 
-                <span className="text-[11px] font-bold text-sky-600">
+                <span className="text-[11px] font-bold text-sky-700">
                   SLIDE {((currentSlide % slides.length) + 1)} / {slides.length}
                 </span>
               </div>
@@ -257,7 +251,7 @@ export function HeroSlider() {
 
               {/* Card Stats Grid */}
               <div className="grid grid-cols-2 gap-3 py-3">
-                <div className="bg-sky-50/70 p-3.5 rounded-2xl border border-sky-100 space-y-1">
+                <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1">
                   <span className="text-[11px] text-slate-500 font-medium block">
                     {slide.stat1_label || 'จุดเด่น 1'}
                   </span>
@@ -269,7 +263,7 @@ export function HeroSlider() {
                   </span>
                 </div>
 
-                <div className="bg-sky-50/70 p-3.5 rounded-2xl border border-sky-100 space-y-1">
+                <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1">
                   <span className="text-[11px] text-slate-500 font-medium block">
                     {slide.stat2_label || 'จุดเด่น 2'}
                   </span>
@@ -283,9 +277,10 @@ export function HeroSlider() {
               </div>
 
               {/* Card Footer Note */}
-              <div className="pt-4 mt-2 border-t border-sky-50 flex items-center justify-between text-xs text-slate-600">
-                <span className="font-medium text-[11px] text-emerald-700 flex items-center gap-1">
-                  {slide.card_footer_note || '✓ ได้รับความยินยอมและการรับรองจาก คปภ.'}
+              <div className="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                <span className="font-medium text-[11px] text-emerald-700 flex items-center gap-1.5">
+                  <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{(slide.card_footer_note || 'ได้รับความยินยอมและการรับรองจาก คปภ.').replace(/^✓\s*/, '')}</span>
                 </span>
               </div>
 
@@ -297,7 +292,7 @@ export function HeroSlider() {
         {/* Carousel Bottom Control Bar */}
         <div className="mt-8 pt-6 border-t border-sky-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           
-          {/* Slide Indicators / Tabs */}
+          {/* Slide Indicators / Tabs - Single Consistent Color Scheme */}
           <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 sm:pb-0">
             {slides.map((s, index) => {
               const isActive = index === (currentSlide % slides.length);
@@ -307,12 +302,12 @@ export function HeroSlider() {
                   onClick={() => goToSlide(index)}
                   className={`group flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-md shadow-orange-500/25'
-                      : 'bg-white hover:bg-sky-50 text-slate-600 border border-sky-200'
+                      ? 'bg-orange-600 text-white shadow-xs'
+                      : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
                 >
-                  <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-white' : 'bg-sky-300 group-hover:bg-sky-400'}`}></span>
+                  <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-white' : 'bg-slate-300 group-hover:bg-slate-400'}`}></span>
                   <span className="whitespace-nowrap max-w-[120px] truncate">
                     {s.title}
                   </span>
@@ -325,7 +320,7 @@ export function HeroSlider() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsAutoPlay(!isAutoPlay)}
-              className="p-2 rounded-xl border border-sky-200 bg-white hover:bg-sky-50 text-slate-600 transition-colors shadow-2xs cursor-pointer"
+              className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 transition-colors shadow-2xs cursor-pointer"
               title={isAutoPlay ? 'พักการสไลด์อัตโนมัติ' : 'เล่นการสไลด์อัตโนมัติ'}
               aria-label={isAutoPlay ? 'Pause autoplay' : 'Resume autoplay'}
             >
@@ -334,19 +329,19 @@ export function HeroSlider() {
 
             <button
               onClick={prevSlide}
-              className="p-2 rounded-xl border border-sky-200 bg-white hover:bg-sky-50 text-slate-700 transition-colors shadow-2xs active:scale-95 cursor-pointer"
+              className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 transition-colors shadow-2xs active:scale-95 cursor-pointer"
               aria-label="Previous slide"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
 
-            <span className="text-xs font-bold text-sky-900 px-2 select-none">
+            <span className="text-xs font-bold text-slate-700 px-2 select-none">
               <span className="text-orange-600 font-black">0{((currentSlide % slides.length) + 1)}</span> / 0{slides.length}
             </span>
 
             <button
               onClick={nextSlide}
-              className="p-2 rounded-xl border border-sky-200 bg-white hover:bg-sky-50 text-slate-700 transition-colors shadow-2xs active:scale-95 cursor-pointer"
+              className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 transition-colors shadow-2xs active:scale-95 cursor-pointer"
               aria-label="Next slide"
             >
               <ChevronRight className="w-4 h-4" />
@@ -356,7 +351,7 @@ export function HeroSlider() {
         </div>
 
         {/* Trust Badges Footer Strip */}
-        <div className="mt-6 pt-5 border-t border-sky-100 flex flex-wrap items-center justify-center sm:justify-between gap-4 text-xs text-sky-900/80 font-medium">
+        <div className="mt-6 pt-5 border-t border-sky-100 flex flex-wrap items-center justify-center sm:justify-between gap-4 text-xs text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-sky-600" />
             <span>เปรียบเทียบข้อมูลผลประโยชน์โปร่งใส เป็นกลาง</span>

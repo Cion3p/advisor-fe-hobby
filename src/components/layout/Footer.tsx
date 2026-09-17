@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Shield, Lock, FileText, Award } from 'lucide-react';
+import { Shield, Lock, FileText, Award, AlertTriangle } from 'lucide-react';
 
 export function Footer() {
   const pathname = usePathname();
@@ -19,11 +19,11 @@ export function Footer() {
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-600 to-brand-600 flex items-center justify-center text-white shadow-md shadow-orange-500/20">
+              <div className="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center text-white shadow-sm shrink-0">
                 <Shield className="w-5 h-5 fill-white/20" />
               </div>
               <span className="text-xl font-black text-white tracking-tight">
-                Modtanoy<span className="text-amber-400">Advisor</span>
+                Modtanoy<span className="text-sky-400">Advisor</span>
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed pr-6">
@@ -31,11 +31,11 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-4 text-xs text-slate-400 pt-2">
               <span className="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
-                <Award className="w-4 h-4 text-amber-400" />
+                <Award className="w-4 h-4 text-orange-400" />
                 ใบอนุญาตตัวแทน คปภ.
               </span>
               <span className="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
-                <Lock className="w-4 h-4 text-wealth-500" />
+                <Lock className="w-4 h-4 text-sky-400" />
                 คุ้มครองข้อมูลตาม PDPA
               </span>
             </div>
@@ -134,7 +134,7 @@ export function Footer() {
         {/* Regulatory Disclaimer Warning (OIC / คปภ. requirement) */}
         <div className="pt-8 text-xs text-slate-500 space-y-3 leading-relaxed">
           <p className="bg-slate-800/60 p-4 rounded-xl border border-slate-800 text-slate-400">
-            <strong className="text-slate-300 font-semibold">⚠️ คำเตือนสำคัญตามข้อกำหนดของสำนักงาน คปภ.:</strong><br />
+            <strong className="text-slate-300 font-semibold inline-flex items-center gap-1.5"><AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />คำเตือนสำคัญตามข้อกำหนดของสำนักงาน คปภ.:</strong><br />
             ผู้ขอเอาประกันภัยควรทำความเข้าใจในรายละเอียดความคุ้มครอง เงื่อนไข ข้อยกเว้น และผลประโยชน์ของแต่ละกรมธรรม์ก่อนตัดสินใจทำประกันภัยทุกครั้ง 
             ข้อมูลที่แสดงบนเว็บไซต์นี้เป็นเพียงข้อมูลสรุปเพื่อการเปรียบเทียบเบื้องต้นเท่านั้น มิใช่เอกสารส่วนหนึ่งของสัญญาประกันภัย 
             การอนุมัติรับประกันภัยขึ้นอยู่กับกฎเกณฑ์การพิจารณาของแต่ละบริษัทประกันชีวิต/วินาศภัย

@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Product } from '@/types';
 import { ShieldCheck, Star, Receipt, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { CompanyBrandBadge } from '@/components/common/CompanyBrandBadge';
 
 interface ProductCardProps {
   product: Product;
@@ -46,9 +47,15 @@ export function ProductCard({ product, onCompareToggle, isCompared = false }: Pr
               {product.title}
             </Link>
           </h3>
-          <p className="text-xs text-sky-700/70 mt-1 font-medium">
-            โดย {product.company_name}
-          </p>
+
+          {/* Insurer Brand Identity Badge */}
+          <div className="mt-2.5 flex items-center">
+            <CompanyBrandBadge
+              companyCode={product.company_code}
+              companyName={product.company_name}
+              variant="pill"
+            />
+          </div>
         </div>
 
         {/* Summary & Highlights */}
@@ -100,7 +107,7 @@ export function ProductCard({ product, onCompareToggle, isCompared = false }: Pr
           {/* Standout CTA Button */}
           <Link
             href={`/consultation?product=${product.id}`}
-            className="flex items-center justify-center gap-1 text-xs font-bold py-2.5 px-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white transition-all shadow-md shadow-orange-500/25 hover:shadow-lg hover:shadow-orange-500/35 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            className="flex items-center justify-center gap-1 text-xs font-bold py-2.5 px-3 rounded-xl bg-orange-600 hover:bg-orange-700 text-white transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
             ขอคำปรึกษาฟรี
           </Link>
