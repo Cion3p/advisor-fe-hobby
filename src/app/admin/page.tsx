@@ -62,7 +62,11 @@ import {
   Tablet,
   Globe,
   Cookie,
-  Shield
+  Shield,
+  ChevronUp,
+  ChevronDown,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { 
   fetchLeadsAPI, 
@@ -966,6 +970,41 @@ export default function AdminPortalPage() {
   };
 
   // --- Hero Slides Handlers ---
+  const handleMoveSlide = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= heroSlides.length) return;
+
+    const updated = [...heroSlides];
+    const [movedSlide] = updated.splice(index, 1);
+    updated.splice(targetIndex, 0, movedSlide);
+
+    const withUpdatedOrder = updated.map((slide, i) => ({
+      ...slide,
+      sort_order: i + 1,
+    }));
+
+    setHeroSlides(withUpdatedOrder);
+    saveHeroSlides(withUpdatedOrder);
+    showToast(`สลับสไลด์ไปที่ลำดับ #${targetIndex + 1} สำเร็จแล้ว`, 'success');
+  };
+
+  const handleMoveSlideToTop = (index: number) => {
+    if (index <= 0 || index >= heroSlides.length) return;
+
+    const updated = [...heroSlides];
+    const [movedSlide] = updated.splice(index, 1);
+    updated.unshift(movedSlide);
+
+    const withUpdatedOrder = updated.map((slide, i) => ({
+      ...slide,
+      sort_order: i + 1,
+    }));
+
+    setHeroSlides(withUpdatedOrder);
+    saveHeroSlides(withUpdatedOrder);
+    showToast(`ตั้ง "${movedSlide.title || 'สไลด์'}" เป็นสไลด์แรกสุดแล้ว`, 'success');
+  };
+
   const handleToggleSlideActive = (id: number) => {
     const updated = heroSlides.map((s) => (s.id === id ? { ...s, is_active: !s.is_active } : s));
     setHeroSlides(updated);
@@ -2962,7 +3001,7 @@ export default function AdminPortalPage() {
                 <div className="p-3.5 bg-sky-50/70 border border-sky-200/80 rounded-2xl flex items-start gap-3 text-xs text-sky-900">
                   <Sparkles className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold">เคล็ดลับการตั้งค่า:</span> สไลด์ที่เปิดสถานะ <strong>"เปิดแสดงผล (Active)"</strong> จะถูกนำไปหมุนสไลด์อัตโนมัติบนหน้าแรกทุกๆ 6 วินาที ผู้ใช้สามารถกดเลื่อนหรือสไวป์ผ่านมือถือได้ และเมื่อมีการแก้ไขข้อมูลที่นี่ ผู้เข้าชมหน้าเว็บจะเห็นข้อมูลใหม่ทันที
+                    <span className="font-bold">เคล็ดลับการตั้งค่า:</span> สไลด์ที่เปิดสถานะ <strong>&quot;เปิดแสดงผล (Active)&quot;</strong> จะถูกนำไปหมุนสไลด์อัตโนมัติบนหน้าแรก สามารถ<strong>กดปุ่ม ▲ เลื่อนขึ้น หรือ ▼ เลื่อนลง เพื่อสลับลำดับการแสดงผล</strong>ของแต่ละสไลด์ได้ทันที ระบบจะอัปเดตไปยังหน้าแรกแบบ Real-time
                   </div>
                 </div>
               </div>
@@ -2981,11 +3020,45 @@ export default function AdminPortalPage() {
                       {/* Left Side: Slide Details & Text Content */}
                       <div className="space-y-3.5 flex-1 min-w-0">
                         
-                        {/* Slide Top Meta Header */}
-                        <div className="flex flex-wrap items-center gap-2.5">
-                          <span className="px-3 py-1 rounded-xl text-xs font-black bg-slate-900 text-white">
-                            สไลด์ลำดับ #{idx + 1}
-                          </span>
+                        {/* Slide Top Meta Header with Reorder Controls */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="inline-flex items-center bg-slate-900 rounded-xl p-0.5 shadow-xs text-white">
+                            <span className="px-2.5 py-1 text-xs font-black">
+                              สไลด์ลำดับ #{idx + 1}
+                            </span>
+                            <div className="flex items-center gap-0.5 pr-1 border-l border-slate-700 pl-1">
+                              <button
+                                type="button"
+                                onClick={() => handleMoveSlide(idx, 'up')}
+                                disabled={idx === 0}
+                                className="p-1 rounded-lg hover:bg-slate-800 disabled:opacity-25 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                title={idx === 0 ? 'เป็นสไลด์แรกแล้ว' : 'เลื่อนขึ้น (แสดงเป็นลำดับก่อนหน้า)'}
+                              >
+                                <ChevronUp className="w-4 h-4 text-orange-400" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleMoveSlide(idx, 'down')}
+                                disabled={idx === heroSlides.length - 1}
+                                className="p-1 rounded-lg hover:bg-slate-800 disabled:opacity-25 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                title={idx === heroSlides.length - 1 ? 'เป็นสไลด์สุดท้ายแล้ว' : 'เลื่อนลง (แสดงเป็นลำดับถัดไป)'}
+                              >
+                                <ChevronDown className="w-4 h-4 text-orange-400" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {idx > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => handleMoveSlideToTop(idx)}
+                              className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition-colors cursor-pointer flex items-center gap-1"
+                              title="ย้ายสไลด์นี้ขึ้นมาเป็นสไลด์แรกสุดของหน้าเว็บ"
+                            >
+                              <ArrowUp className="w-3 h-3 text-amber-700" />
+                              <span>ตั้งเป็นสไลด์แรก</span>
+                            </button>
+                          )}
 
                           <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold ${
                             slide.is_active 
@@ -3108,7 +3181,32 @@ export default function AdminPortalPage() {
                         </div>
 
                         {/* Action Buttons for this slide */}
-                        <div className="flex items-center justify-end gap-2 pt-1">
+                        <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
+                          {/* Reorder Buttons */}
+                          <div className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 p-0.5 shadow-2xs">
+                            <button
+                              type="button"
+                              onClick={() => handleMoveSlide(idx, 'up')}
+                              disabled={idx === 0}
+                              className="px-2 py-1.5 text-xs font-bold text-slate-700 hover:bg-white rounded-lg disabled:opacity-25 transition-all flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+                              title="เลื่อนสไลด์ขึ้น (แสดงก่อน)"
+                            >
+                              <ChevronUp className="w-3.5 h-3.5 text-orange-600" />
+                              <span>ขึ้น</span>
+                            </button>
+                            <span className="text-slate-300 text-xs">|</span>
+                            <button
+                              type="button"
+                              onClick={() => handleMoveSlide(idx, 'down')}
+                              disabled={idx === heroSlides.length - 1}
+                              className="px-2 py-1.5 text-xs font-bold text-slate-700 hover:bg-white rounded-lg disabled:opacity-25 transition-all flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+                              title="เลื่อนสไลด์ลง (แสดงทีหลัง)"
+                            >
+                              <ChevronDown className="w-3.5 h-3.5 text-orange-600" />
+                              <span>ลง</span>
+                            </button>
+                          </div>
+
                           <button
                             onClick={() => handleToggleSlideActive(slide.id)}
                             className={`px-3 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
