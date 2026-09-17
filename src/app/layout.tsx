@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
-import { Prompt, Plus_Jakarta_Sans } from 'next/font/google';
+import { Noto_Sans_Thai, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 
-const prompt = Prompt({
+const notoSansThai = Noto_Sans_Thai({
   subsets: ['thai', 'latin'],
   weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-prompt',
+  variable: '--font-noto-sans-thai',
   display: 'swap',
 });
 
@@ -75,7 +75,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="th" className={`${prompt.variable} ${plusJakarta.variable}`}>
+    <html lang="th" className={`${notoSansThai.variable} ${plusJakarta.variable}`}>
       <head>
         <script
           type="application/ld+json"

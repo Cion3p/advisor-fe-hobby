@@ -103,7 +103,7 @@ export interface Article {
   title: string;
   slug: string;
   excerpt: string;
-  content: string;
+  content?: string;
   author_name: string;
   author_license?: string;
   cover_image_url?: string;
@@ -111,4 +111,47 @@ export interface Article {
   published_at: string;
   category_name?: string;
   category_slug?: string;
+}
+
+export interface HeroSlide {
+  id: number;
+  badge_text: string;
+  badge_icon?: string;
+  title: string;
+  title_highlight: string;
+  subtitle: string;
+  tags: string[];
+  primary_btn_label: string;
+  primary_btn_href: string;
+  secondary_btn_label: string;
+  secondary_btn_href: string;
+  card_badge: string;
+  card_main_title: string;
+  card_main_metric: string;
+  card_main_metric_sub: string;
+  stat1_label: string;
+  stat1_value: string;
+  stat1_desc: string;
+  stat2_label: string;
+  stat2_value: string;
+  stat2_desc: string;
+  card_footer_note: string;
+  is_active: boolean;
+  sort_order?: number;
+  background_image?: string;
+}
+
+export interface AnnouncementPopup {
+  id: string;
+  is_active: boolean;
+  badge_text?: string;
+  title: string;
+  subtitle: string;
+  image_url: string;
+  primary_btn_label: string;
+  primary_btn_href: string;
+  secondary_btn_label?: string;
+  secondary_btn_href?: string;
+  show_countdown?: boolean;
+  countdown_end_date?: string;
 }

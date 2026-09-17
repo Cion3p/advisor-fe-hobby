@@ -9,21 +9,40 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-prompt)', 'var(--font-plus-jakarta)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-noto-sans-thai)', 'Noto Sans Thai', 'var(--font-plus-jakarta)', 'system-ui', 'sans-serif'],
       },
       colors: {
+        pastel: {
+          25: '#f8fcff',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+        },
+        cta: {
+          50: '#fff7ed',
+          100: '#ffedd5',
+          400: '#fb923c',
+          500: '#f97316',
+          600: '#ea580c',
+          700: '#c2410c',
+        },
         brand: {
-          50: '#f0f6fe',
-          100: '#ddeafe',
-          200: '#c2dbfd',
-          300: '#97c4fb',
-          400: '#64a3f7',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#111e48',
+          50: '#f0f8ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0284c7',
+          600: '#0369a1',
+          700: '#075985',
+          800: '#0c4a6e',
+          900: '#082f49',
+          950: '#051926',
         },
         modtanoy: {
           50: '#fffbeb',
@@ -48,7 +67,8 @@ const config: Config = {
         }
       },
       boxShadow: {
-        'glow-brand': '0 0 25px -5px rgba(37, 99, 235, 0.25)',
+        'glow-brand': '0 0 25px -5px rgba(2, 132, 199, 0.25)',
+        'glow-cta': '0 0 25px -5px rgba(234, 88, 12, 0.4)',
         'glow-amber': '0 0 25px -5px rgba(245, 158, 11, 0.3)',
       }
     },

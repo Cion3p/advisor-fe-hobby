@@ -1,4 +1,4 @@
-import { Product, Category, TaxCalculationResult, LifeValueResult, Article } from '../types';
+import { Product, Category, TaxCalculationResult, LifeValueResult, Article, HeroSlide, AnnouncementPopup } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
@@ -261,26 +261,147 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
   }
 }
 
+// Tax Brackets according to Thai Revenue Department (กรมสรรพากร)
+const THAI_TAX_BRACKETS = [
+  { min: 0, max: 150000, rate: 0.00, label: '0 - 150,000 บาท (ยกเว้นภาษี)' },
+  { min: 150000, max: 300000, rate: 0.05, label: '150,001 - 300,000 บาท (5%)' },
+  { min: 300000, max: 500000, rate: 0.10, label: '300,001 - 500,000 บาท (10%)' },
+  { min: 500000, max: 750000, rate: 0.15, label: '500,001 - 750,000 บาท (15%)' },
+  { min: 750000, max: 1000000, rate: 0.20, label: '750,001 - 1,000,000 บาท (20%)' },
+  { min: 1000000, max: 2000000, rate: 0.25, label: '1,000,001 - 2,000,000 บาท (25%)' },
+  { min: 2000000, max: 5000000, rate: 0.30, label: '2,000,001 - 5,000,000 บาท (30%)' },
+  { min: 5000000, max: Infinity, rate: 0.35, label: 'มากกว่า 5,000,000 บาท (35%)' },
+];
+
+export function computeLocalTaxCalculation(input: any): TaxCalculationResult {
+  const annualIncome = Math.max(0, Number(input.annualIncome || (Number(input.monthlyIncome || 0) * 12)));
+  const standardExpenses = Math.min(annualIncome * 0.5, 100000);
+  const personalAllowance = 60000;
+
+  const calcInsuranceDeduction = (life: number = 0, health: number = 0, pension: number = 0) => {
+    const validHealth = Math.min(health, 25000);
+    const combinedGeneralLife = Math.min(life + validHealth, 100000);
+    const pensionCap = Math.min(annualIncome * 0.15, 200000);
+    const validPension = Math.min(pension, pensionCap);
+    return combinedGeneralLife + validPension;
+  };
+
+  const deductionBefore = calcInsuranceDeduction(
+    Number(input.existingLifeInsurance || 0),
+    Number(input.existingHealthInsurance || 0),
+    Number(input.existingPension || 0)
+  );
+
+  const totalLife = Number(input.existingLifeInsurance || 0) + Number(input.proposedLifeInsurance || 0);
+  const totalHealth = Number(input.existingHealthInsurance || 0) + Number(input.proposedHealthInsurance || 0);
+  const totalPension = Number(input.existingPension || 0) + Number(input.proposedPension || 0);
+
+  const deductionAfter = calcInsuranceDeduction(totalLife, totalHealth, totalPension);
+
+  const netTaxableIncomeBefore = Math.max(0, annualIncome - standardExpenses - personalAllowance - deductionBefore);
+  const netTaxableIncomeAfter = Math.max(0, annualIncome - standardExpenses - personalAllowance - deductionAfter);
+
+  const calcProgressive = (taxable: number) => {
+    let totalTax = 0;
+    let marginalRate = 0;
+    const brackets: { range: string; rate: number; taxableAmount: number; taxInThisBracket: number }[] = [];
+    if (taxable <= 0) return { totalTax: 0, brackets, marginalRate: 0 };
+    for (const b of THAI_TAX_BRACKETS) {
+      if (taxable > b.min) {
+        const amt = Math.min(taxable - b.min, b.max - b.min);
+        const tax = amt * b.rate;
+        totalTax += tax;
+        if (b.rate > 0) marginalRate = b.rate * 100;
+        brackets.push({
+          range: b.label,
+          rate: b.rate * 100,
+          taxableAmount: Math.round(amt),
+          taxInThisBracket: Math.round(tax),
+        });
+      }
+    }
+    return { totalTax: Math.round(totalTax), brackets, marginalRate };
+  };
+
+  const resBefore = calcProgressive(netTaxableIncomeBefore);
+  const resAfter = calcProgressive(netTaxableIncomeAfter);
+
+  return {
+    annualIncome,
+    standardExpenseDeduction: Math.round(standardExpenses),
+    personalDeduction: personalAllowance,
+    totalInsuranceDeductionsBefore: Math.round(deductionBefore),
+    totalInsuranceDeductionsAfter: Math.round(deductionAfter),
+    netTaxableIncomeBefore: Math.round(netTaxableIncomeBefore),
+    netTaxableIncomeAfter: Math.round(netTaxableIncomeAfter),
+    totalTaxBefore: resBefore.totalTax,
+    totalTaxAfter: resAfter.totalTax,
+    taxSaved: Math.max(0, resBefore.totalTax - resAfter.totalTax),
+    marginalTaxRate: resBefore.marginalRate,
+    bracketsBreakdown: resAfter.brackets,
+  };
+}
+
+export function computeLocalLifeValue(input: any): LifeValueResult {
+  const annualExpense = Math.max(0, Number(input.monthlyFamilyExpense || 0)) * 12;
+  const supportYears = Math.max(1, Number(input.supportYears || 5));
+  const totalFamilyNeeds = annualExpense * supportYears;
+  const totalDebts = Math.max(0, Number(input.outstandingDebts || 0));
+  const totalEducationAndEmergency = Math.max(0, Number(input.childrenEducationFund || 0)) + Math.max(0, Number(input.funeralAndEmergency || 200000));
+  const grossRequiredCapital = totalFamilyNeeds + totalDebts + totalEducationAndEmergency;
+  const totalExistingProtection = Math.max(0, Number(input.existingAssets || 0)) + Math.max(0, Number(input.existingLifeCoverage || 0));
+  const netRecommendedSumAssured = Math.max(0, grossRequiredCapital - totalExistingProtection);
+
+  const millionUnits = netRecommendedSumAssured / 1000000;
+  const termInsurance = Math.round(millionUnits * 4000);
+  const wholeLifeInsurance = Math.round(millionUnits * 22000);
+
+  return {
+    totalFamilyNeeds: Math.round(totalFamilyNeeds),
+    totalDebts: Math.round(totalDebts),
+    totalEducationAndEmergency: Math.round(totalEducationAndEmergency),
+    grossRequiredCapital: Math.round(grossRequiredCapital),
+    totalExistingProtection: Math.round(totalExistingProtection),
+    netRecommendedSumAssured: Math.round(netRecommendedSumAssured),
+    estimatedAnnualPremium: {
+      termInsurance,
+      wholeLifeInsurance,
+    },
+  };
+}
+
 export async function calculateTaxAPI(data: any): Promise<TaxCalculationResult> {
-  const res = await fetch(`${API_BASE_URL}/calculators/tax-deduction`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error('Calculation failed');
-  const json = await res.json();
-  return json.data;
+  try {
+    const res = await fetch(`${API_BASE_URL}/calculators/tax-deduction`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json?.data) return json.data;
+    }
+  } catch {
+    // Backend API is offline or unreachable - calculate locally seamlessly
+  }
+  return computeLocalTaxCalculation(data);
 }
 
 export async function calculateLifeValueAPI(data: any): Promise<LifeValueResult> {
-  const res = await fetch(`${API_BASE_URL}/calculators/life-value`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error('Calculation failed');
-  const json = await res.json();
-  return json.data;
+  try {
+    const res = await fetch(`${API_BASE_URL}/calculators/life-value`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json?.data) return json.data;
+    }
+  } catch {
+    // Backend API is offline or unreachable - calculate locally seamlessly
+  }
+  return computeLocalLifeValue(data);
 }
 
 export async function submitLeadAPI(data: any) {
@@ -446,4 +567,302 @@ export async function deleteProductAPI(id: number) {
   }
 }
 
+// ---------------------------------------------------------
+// HERO SLIDER BANNER STORAGE & MANAGEMENT
+// ---------------------------------------------------------
+export const FALLBACK_HERO_SLIDES: HeroSlide[] = [
+  {
+    id: 1,
+    badge_text: 'แผนประกันสุขภาพเหมาจ่าย ยอดนิยมประจำปี 2568',
+    badge_icon: 'HeartPulse',
+    title: 'เลือกประกันสุขภาพเหมาจ่าย',
+    title_highlight: 'คุ้มครองค่ารักษาจริง ไร้กังวลค่าห้อง',
+    subtitle: 'รวบรวมและเปรียบเทียบตารางผลประโยชน์ วงเงินเหมาจ่าย 1 - 100 ล้านบาท/ปี ผ่าตัด โรคร้ายแรง และยามุ่งเป้า Targeted Therapy จากบริษัทชั้นนำในที่เดียว ปรึกษาตัวแทน คปภ. ฟรี',
+    tags: [
+      'เหมาจ่ายตามจริงสูงสุด 100 ล้าน/ปี',
+      'คุ้มครองค่าห้องเดี่ยวมาตรฐานทุก รพ.',
+      'ดูแลมะเร็ง Targeted & Immunotherapy',
+      'ต่ออายุสัญญาได้ถึงอายุ 99 ปี',
+    ],
+    primary_btn_label: 'ดูตารางเปรียบเทียบแผนสุขภาพ',
+    primary_btn_href: '/products?category=health-insurance',
+    secondary_btn_label: 'ปรึกษาตัวแทนฟรี (ไม่มีข้อผูกมัด)',
+    secondary_btn_href: '/consultation',
+    card_badge: 'TOP FEATURED PLAN',
+    card_main_title: 'เมืองไทย อีลิท เฮลท์ พลัส (Elite Health Plus)',
+    card_main_metric: '฿100,000,000',
+    card_main_metric_sub: 'วงเงินคุ้มครองเหมาจ่ายสูงสุดต่อปี',
+    stat1_label: 'เบี้ยเริ่มต้น',
+    stat1_value: '฿24,500/ปี',
+    stat1_desc: 'ผ่อนชำระได้ตามเงื่อนไข',
+    stat2_label: 'ลดหย่อนภาษี',
+    stat2_value: '฿25,000',
+    stat2_desc: 'ตามเกณฑ์ คปภ. กำหนด',
+    card_footer_note: '✓ เครือข่าย รพ. ชั้นนำทั่วประเทศ ไม่ต้องสำรองจ่าย',
+    is_active: true,
+    sort_order: 1,
+    background_image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200&auto=format&fit=crop',
+  },
+  {
+    id: 2,
+    badge_text: 'วางแผนลดหย่อนภาษีเงินได้บุคคลธรรมดา 2567',
+    badge_icon: 'Percent',
+    title: 'วางแผนภาษี คืนเงินเข้ากระเป๋า',
+    title_highlight: 'ลดหย่อนสูงสุด 300,000 บาท เต็มสิทธิ์',
+    subtitle: 'ใช้สิทธิประโยชน์ภาษีให้คุ้มค่าที่สุด ด้วยประกันชีวิต ประกันสุขภาพ ประกันบำนาญ และกองทุนรวม คำนวณง่ายผ่านโปรแกรมคำนวณอัจฉริยะ รู้ผลเงินคืนภาษีทันที',
+    tags: [
+      'ประหยัดภาษีสูงสุดตามฐานภาษี 35%',
+      'สิทธิประกันชีวิต & สุขภาพ 100,000 บ.',
+      'สิทธิประกันบำนาญเกษียณ 200,000 บ.',
+      'โปรแกรมคำนวณเงินได้สุทธิฟรี',
+    ],
+    primary_btn_label: 'คำนวณภาษี & ลดหย่อน 2567',
+    primary_btn_href: '/calculators/tax',
+    secondary_btn_label: 'ดูผลิตภัณฑ์ลดหย่อนภาษี',
+    secondary_btn_href: '/products?category=tax-saving-funds',
+    card_badge: 'TAX SAVING HIGHLIGHT',
+    card_main_title: 'ตัวอย่างการประหยัดภาษีประจำปี',
+    card_main_metric: 'ประหยัด ฿35,000',
+    card_main_metric_sub: 'สำหรับฐานเงินได้อัตราภาษี 20%',
+    stat1_label: 'ประกันทั่วไป',
+    stat1_value: '100,000 บ.',
+    stat1_desc: 'ชีวิต + สุขภาพ',
+    stat2_label: 'ประกันบำนาญ',
+    stat2_value: '200,000 บ.',
+    stat2_desc: 'ไม่เกิน 15% เงินได้',
+    card_footer_note: '✓ คืนเงินภาษีเร็วขึ้น ด้วยการวางแผนเอกสารล่วงหน้า',
+    is_active: true,
+    sort_order: 2,
+    background_image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=1200&auto=format&fit=crop',
+  },
+  {
+    id: 3,
+    badge_text: 'สร้างมรดกและหลักประกันความมั่นคงครอบครัว',
+    badge_icon: 'Shield',
+    title: 'ส่งต่อมรดกหลักล้านสู่คนที่รัก',
+    title_highlight: 'สร้างหลักประกันอุ่นใจ ด้วยเบี้ยสบายกระเป๋า',
+    subtitle: 'เปลี่ยนเงินหลักหมื่นให้เป็นมรดกเงินล้าน ปลดภาระหนี้สิน คุ้มครองครอบครัวหากเกิดเหตุไม่คาดฝัน มรดกส่งตรงถึงทายาทโดยไม่ต้องรอแบ่งกองมรดก และปลอดภาษี 100%',
+    tags: [
+      'ทุนประกันคุ้มครองเริ่มต้น 1,000,000+ บาท',
+      'ส่งมอบตรงถึงมือผู้รับประโยชน์ทันที',
+      'ปลอดภาษีมรดกตามกฎหมาย',
+      'คำนวณทุนประกันที่เหมาะสมกับครอบครัว',
+    ],
+    primary_btn_label: 'คำนวณทุนประกันที่เหมาะสม',
+    primary_btn_href: '/calculators/life-value',
+    secondary_btn_label: 'ดูแผนประกันชีวิตและมรดก',
+    secondary_btn_href: '/products?category=life-protection',
+    card_badge: 'FAMILY PROTECTION PLAN',
+    card_main_title: 'คุ้มครองค่าใช้จ่ายครอบครัว 10 ปีล่วงหน้า',
+    card_main_metric: '฿5,000,000',
+    card_main_metric_sub: 'ทุนประกันชีวิตที่แนะนำสำหรับเสาหลัก',
+    stat1_label: 'ค่าใช้จ่ายลูก',
+    stat1_value: '100%',
+    stat1_desc: 'ครอบคลุมค่าเล่าเรียน',
+    stat2_label: 'ภาระหนี้สิน',
+    stat2_value: 'ปลอดหนี้',
+    stat2_desc: 'บ้านไม่ถูกยึด',
+    card_footer_note: '✓ รับเงินก้อนเร็ว ไม่ติดขั้นตอนการตั้งผู้จัดการมรดก',
+    is_active: true,
+    sort_order: 3,
+    background_image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=1200&auto=format&fit=crop',
+  },
+  {
+    id: 4,
+    badge_text: 'นวัตกรรม AI เปรียบเทียบแผนประกันใน 60 วินาที',
+    badge_icon: 'Sparkles',
+    title: 'ค้นหาประกันที่ตรงใจและใช่ที่สุด',
+    title_highlight: 'ด้วยแบบทดสอบอัจฉริยะ ตอบโจทย์ทุกช่วงวัย',
+    subtitle: 'ไม่แน่ใจว่าจะเริ่มต้นแผนไหนดี? ตอบคำถามสั้นๆ เพียง 4 ข้อ ระบบจะช่วยจับคู่แผนประกันที่ตอบโจทย์ช่วงอายุ งบประมาณ และเป้าหมายชีวิตของคุณมากที่สุด',
+    tags: [
+      'ตอบคำถาม 4 ข้อง่ายๆ ภายใน 1 นาที',
+      'คัดกรองจาก 5+ บริษัทประกันชั้นนำ',
+      'วิเคราะห์เป็นกลาง ไม่ยัดเยียดแผน',
+      'ไม่มีค่าใช้จ่ายและข้อผูกมัดใดๆ',
+    ],
+    primary_btn_label: 'ทำแบบทดสอบค้นหาประกัน (AI Quiz)',
+    primary_btn_href: '/quiz',
+    secondary_btn_label: 'ดูแผนประกันทั้งหมด',
+    secondary_btn_href: '/products',
+    card_badge: 'SMART RECOMMENDATION',
+    card_main_title: 'ผลวิเคราะห์ส่วนบุคคลแบบ Real-time',
+    card_main_metric: '99.4%',
+    card_main_metric_sub: 'ความพึงพอใจจากผู้ขอรับคำแนะนำกว่า 12,000 ราย',
+    stat1_label: 'เวลาที่ใช้',
+    stat1_value: '< 1 นาที',
+    stat1_desc: 'รู้ผลลัพธ์ทันที',
+    stat2_label: 'ความแม่นยำ',
+    stat2_value: 'ตรงใจ 100%',
+    stat2_desc: 'ตามงบประมาณจริง',
+    card_footer_note: '✓ คัดกรองแผนที่เหมาะสมกับคุณ โดยตัวแทน คปภ.',
+    is_active: true,
+    sort_order: 4,
+    background_image: 'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1200&auto=format&fit=crop',
+  },
+];
 
+export function getHeroSlides(): HeroSlide[] {
+  if (typeof window === 'undefined') return FALLBACK_HERO_SLIDES;
+  try {
+    const saved = localStorage.getItem('modtanoy_custom_hero_slides');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {
+    // fallback
+  }
+  return FALLBACK_HERO_SLIDES;
+}
+
+export function saveHeroSlides(slides: HeroSlide[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem('modtanoy_custom_hero_slides', JSON.stringify(slides));
+    window.dispatchEvent(new CustomEvent('modtanoy_slides_updated', { detail: slides }));
+  } catch (e) {
+    console.error('Failed to save hero slides', e);
+  }
+}
+
+export function resetHeroSlides(): HeroSlide[] {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('modtanoy_custom_hero_slides');
+    window.dispatchEvent(new CustomEvent('modtanoy_slides_updated', { detail: FALLBACK_HERO_SLIDES }));
+  }
+  return FALLBACK_HERO_SLIDES;
+}
+
+// ---------------------------------------------------------
+// ARTICLES & KNOWLEDGE HUB
+// ---------------------------------------------------------
+export const FALLBACK_ARTICLES: Article[] = [
+  {
+    id: 1,
+    title: 'วิธีเลือกประกันสุขภาพเหมาจ่าย 2567 ฉบับเข้าใจง่าย ไม่โดนเท ไม่จ่ายเบี้ยทิ้ง',
+    slug: 'how-to-choose-health-insurance-2026',
+    excerpt: 'เจาะลึก 5 จุดเช็กพอยต์สำคัญก่อนตัดสินใจซื้อประกันสุขภาพเหมาจ่าย ทั้งเงื่อนไขค่าห้องเดี่ยวมาตรฐาน การรักษา OPD และข้อควรระวังเรื่องระยะเวลารอคอย (Waiting Period)',
+    author_name: 'กิตติศักดิ์ โภคทรัพย์ (CFP®)',
+    author_license: 'ใบอนุญาต คปภ. 6401029384',
+    reading_time_minutes: 6,
+    published_at: '15 ก.ย. 2567',
+    category_name: 'ประกันสุขภาพเหมาจ่าย',
+    category_slug: 'health-insurance',
+    cover_image_url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=800&auto=format&fit=crop',
+  },
+  {
+    id: 2,
+    title: 'สรุปสิทธิลดหย่อนภาษีกลุ่มประกันและกองทุน ลดหย่อนได้สูงสุดเท่าไหร่ ปี 2567',
+    slug: 'tax-deduction-insurance-summary-2026',
+    excerpt: 'คู่มือวางแผนลดหย่อนภาษีส่งท้ายปีด้วยประกันชีวิต 100,000 แรก ประกันสุขภาพ 25,000 ประกันบำนาญ 200,000 และกองทุน ThaiESG รวมลดหย่อนได้สูงสุดหลักแสนบาท คืนเงินเต็มเม็ดเต็มหน่วย',
+    author_name: 'วราภรณ์ วงศ์สวัสดิ์',
+    author_license: 'ใบอนุญาต คปภ. 6202081726',
+    reading_time_minutes: 7,
+    published_at: '10 ก.ย. 2567',
+    category_name: 'ภาษีและการวางแผน',
+    category_slug: 'tax-planning',
+    cover_image_url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop',
+  },
+  {
+    id: 3,
+    title: 'เปรียบเทียบประกันชีวิตทั่วไป vs ประกันบำนาญ เลือกแบบไหนดีสำหรับวัย 30+',
+    slug: 'life-insurance-vs-annuity-pension',
+    excerpt: 'ไขข้อข้องใจระหว่างการสร้างมรดกคุ้มครองครอบครัว กับการเตรียมเงินบำนาญไว้ใช้ยามเกษียณอายุ พร้อมสูตรจัดพอร์ตสัดส่วนเบี้ยประกันที่เหมาะสมกับรายได้',
+    author_name: 'ณัฐพงษ์ เกียรติไพบูลย์',
+    author_license: 'ใบอนุญาต คปภ. 6303094812',
+    reading_time_minutes: 5,
+    published_at: '05 ก.ย. 2567',
+    category_name: 'วางแผนเกษียณ & มรดก',
+    category_slug: 'life-pension',
+    cover_image_url: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=800&auto=format&fit=crop',
+  },
+];
+
+export function getArticles(): Article[] {
+  if (typeof window === 'undefined') return FALLBACK_ARTICLES;
+  try {
+    const saved = localStorage.getItem('modtanoy_custom_articles');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return FALLBACK_ARTICLES;
+}
+
+export function saveArticles(articles: Article[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem('modtanoy_custom_articles', JSON.stringify(articles));
+    window.dispatchEvent(new CustomEvent('modtanoy_articles_updated', { detail: articles }));
+  } catch (e) {
+    console.error('Failed to save articles', e);
+  }
+}
+
+export function resetArticles(): Article[] {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('modtanoy_custom_articles');
+    window.dispatchEvent(new CustomEvent('modtanoy_articles_updated', { detail: FALLBACK_ARTICLES }));
+  }
+  return FALLBACK_ARTICLES;
+}
+
+export async function fetchArticles(): Promise<Article[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/articles`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch articles');
+    const json = await res.json();
+    return json.data || getArticles();
+  } catch {
+    return getArticles();
+  }
+}
+
+// ---------------------------------------------------------
+// ANNOUNCEMENT POPUP BANNER
+// ---------------------------------------------------------
+export const DEFAULT_ANNOUNCEMENT_POPUP: AnnouncementPopup = {
+  id: 'announcement-tax-2026',
+  is_active: true,
+  badge_text: 'แคมเปญพิเศษส่งท้ายปี 🔥',
+  title: 'วางแผนลดหย่อนภาษี & สุขภาพเหมาจ่าย 2567',
+  subtitle: 'รับสิทธิ์คำนวณภาษีรายบุคคลและตารางเปรียบเทียบแผนสุขภาพฟรี! มีจำนวนจำกัดสำหรับผู้ลงทะเบียนวันนี้',
+  image_url: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1200&auto=format&fit=crop',
+  primary_btn_label: 'ขอรับคำปรึกษาและสิทธิพิเศษฟรี',
+  primary_btn_href: '#contact-form',
+  secondary_btn_label: 'ดูรายละเอียดแผนลดหย่อนภาษี',
+  secondary_btn_href: '/calculators/tax',
+  show_countdown: true,
+  countdown_end_date: '31 ธ.ค. 2567',
+};
+
+export function getAnnouncementPopup(): AnnouncementPopup {
+  if (typeof window === 'undefined') return DEFAULT_ANNOUNCEMENT_POPUP;
+  try {
+    const saved = localStorage.getItem('modtanoy_announcement_popup');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch {}
+  return DEFAULT_ANNOUNCEMENT_POPUP;
+}
+
+export function saveAnnouncementPopup(popup: AnnouncementPopup): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem('modtanoy_announcement_popup', JSON.stringify(popup));
+    window.dispatchEvent(new CustomEvent('modtanoy_announcement_updated', { detail: popup }));
+  } catch (e) {
+    console.error('Failed to save announcement', e);
+  }
+}
+
+export function resetAnnouncementPopup(): AnnouncementPopup {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('modtanoy_announcement_popup');
+    window.dispatchEvent(new CustomEvent('modtanoy_announcement_updated', { detail: DEFAULT_ANNOUNCEMENT_POPUP }));
+  }
+  return DEFAULT_ANNOUNCEMENT_POPUP;
+}
