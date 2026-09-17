@@ -1068,6 +1068,31 @@ export default function AdminPortalPage() {
   };
 
   // --- Article Handlers ---
+  const handleMoveArticle = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= articles.length) return;
+
+    const updated = [...articles];
+    const [movedArticle] = updated.splice(index, 1);
+    updated.splice(targetIndex, 0, movedArticle);
+
+    setArticles(updated);
+    saveArticles(updated);
+    showToast(`สลับบทความไปที่ลำดับ #${targetIndex + 1} สำเร็จแล้ว`, 'success');
+  };
+
+  const handleMoveArticleToTop = (index: number) => {
+    if (index <= 0 || index >= articles.length) return;
+
+    const updated = [...articles];
+    const [movedArticle] = updated.splice(index, 1);
+    updated.unshift(movedArticle);
+
+    setArticles(updated);
+    saveArticles(updated);
+    showToast(`ตั้ง "${movedArticle.title}" เป็นบทความแรกสุดแล้ว`, 'success');
+  };
+
   const handleCreateArticle = (e: React.FormEvent) => {
     e.preventDefault();
     const newArticle: Article = {
@@ -3368,9 +3393,52 @@ export default function AdminPortalPage() {
                       )}
 
                       <div>
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
-                          <span>ลำดับที่ #{idx + 1}</span>
-                          <span>{article.published_at}</span>
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 mb-2">
+                          <div className="flex items-center gap-1.5">
+                            <div className="inline-flex items-center bg-slate-900 rounded-lg p-0.5 text-white font-black text-[10px]">
+                              <span className="px-2">ลำดับ #{idx + 1}</span>
+                              <div className="flex items-center border-l border-slate-700 pl-0.5 pr-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveArticle(idx, 'up')}
+                                  disabled={idx === 0}
+                                  className="p-0.5 hover:bg-slate-800 disabled:opacity-25 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                  title={idx === 0 ? 'เป็นบทความแรกแล้ว' : 'เลื่อนขึ้น (แสดงก่อน)'}
+                                >
+                                  <ChevronUp className="w-3.5 h-3.5 text-orange-400" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveArticle(idx, 'down')}
+                                  disabled={idx === articles.length - 1}
+                                  className="p-0.5 hover:bg-slate-800 disabled:opacity-25 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                  title={idx === articles.length - 1 ? 'เป็นบทความสุดท้ายแล้ว' : 'เลื่อนลง (แสดงทีหลัง)'}
+                                >
+                                  <ChevronDown className="w-3.5 h-3.5 text-orange-400" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {idx > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => handleMoveArticleToTop(idx)}
+                                className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition-colors cursor-pointer flex items-center gap-0.5"
+                                title="ย้ายขึ้นมาเป็นบทความแนะนำอันดับ 1 หน้าแรก"
+                              >
+                                <ArrowUp className="w-2.5 h-2.5 text-amber-700" />
+                                <span>ขึ้นหน้าแรก</span>
+                              </button>
+                            )}
+
+                            {idx < 3 && (
+                              <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-[9px] font-bold">
+                                หน้าแรก ✓
+                              </span>
+                            )}
+                          </div>
+
+                          <span className="text-slate-400">{article.published_at}</span>
                         </div>
                         <h4 className="text-sm font-bold text-slate-900 leading-snug line-clamp-2">
                           {article.title}
@@ -3392,23 +3460,50 @@ export default function AdminPortalPage() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                      <button
-                        onClick={() => setEditingArticle({ ...article })}
-                        className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-800 transition-colors flex items-center gap-1 cursor-pointer"
-                      >
-                        <Edit3 className="w-3.5 h-3.5 text-sky-600" />
-                        <span>แก้ไขบทความ</span>
-                      </button>
+                    <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-slate-100">
+                      {/* Reorder Buttons */}
+                      <div className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 p-0.5 shadow-2xs">
+                        <button
+                          type="button"
+                          onClick={() => handleMoveArticle(idx, 'up')}
+                          disabled={idx === 0}
+                          className="px-2 py-1 text-xs font-bold text-slate-700 hover:bg-white rounded-lg disabled:opacity-25 transition-all flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+                          title="เลื่อนบทความขึ้น (แสดงก่อน)"
+                        >
+                          <ChevronUp className="w-3 h-3 text-orange-600" />
+                          <span>ขึ้น</span>
+                        </button>
+                        <span className="text-slate-300 text-xs">|</span>
+                        <button
+                          type="button"
+                          onClick={() => handleMoveArticle(idx, 'down')}
+                          disabled={idx === articles.length - 1}
+                          className="px-2 py-1 text-xs font-bold text-slate-700 hover:bg-white rounded-lg disabled:opacity-25 transition-all flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+                          title="เลื่อนบทความลง (แสดงทีหลัง)"
+                        >
+                          <ChevronDown className="w-3 h-3 text-orange-600" />
+                          <span>ลง</span>
+                        </button>
+                      </div>
 
-                      <button
-                        onClick={() => handleDeleteArticle(article.id, article.title)}
-                        disabled={articles.length <= 1}
-                        className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors disabled:opacity-30 cursor-pointer"
-                        title="ลบบทความ"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => setEditingArticle({ ...article })}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-800 transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          <Edit3 className="w-3.5 h-3.5 text-sky-600" />
+                          <span>แก้ไข</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteArticle(article.id, article.title)}
+                          disabled={articles.length <= 1}
+                          className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors disabled:opacity-30 cursor-pointer"
+                          title="ลบบทความ"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
 
                   </div>
