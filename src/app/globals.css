@@ -3,123 +3,101 @@
 @tailwind utilities;
 
 :root {
-  --foreground: 9, 9, 11;
-  --background: 250, 250, 250;
+  --foreground: 18, 17, 16;
+  --background: 251, 250, 246;
 }
 
 body {
-  color: #09090b;
-  background-color: #fafafa;
+  color: #171615;
+  background-color: #fbfaf6;
   min-height: 100vh;
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Taste.md Component standards */
-.taste-card {
+/* Taste_v2.md High-End Editorial & Luxury Brand Showcase Standards */
+.editorial-frame {
   background-color: #ffffff;
-  border: 1px solid #e4e4e7;
-  border-radius: 0.75rem;
-  transition: border-color 150ms ease-out;
+  border: 1px solid #e7e5e0;
+  border-radius: 0;
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.taste-card:hover {
-  border-color: #d4d4d8;
-}
-
-.taste-card-dark {
-  background-color: rgba(24, 24, 27, 0.6);
-  border: 1px solid rgba(39, 39, 42, 0.8);
-  border-radius: 0.75rem;
-  transition: border-color 150ms ease-out;
-}
-.taste-card-dark:hover {
-  border-color: rgba(63, 63, 70, 0.8);
+.editorial-frame:hover {
+  border-color: #c5a059;
 }
 
-.taste-badge {
+.editorial-frame-dark {
+  background-color: #121110;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.editorial-frame-dark:hover {
+  border-color: #c5a059;
+}
+
+.editorial-eyebrow {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-weight: 500;
+  color: #78716c;
+}
+
+.editorial-btn-primary {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.125rem 0.625rem;
-  border-radius: 9999px;
+  justify-content: center;
+  padding: 0.625rem 1.5rem;
+  border-radius: 0;
   font-size: 0.75rem;
-  font-weight: 500;
-  background-color: #f4f4f5;
-  color: #3f3f46;
-  border: 1px solid #e4e4e7;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  background-color: #0c0b0a;
+  color: #fcfbf7;
+  border: 1px solid #0c0b0a;
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.editorial-btn-primary:hover {
+  background-color: #c5a059;
+  border-color: #c5a059;
+  color: #0c0b0a;
+}
+.editorial-btn-primary:active {
+  transform: scale(0.99);
 }
 
-.taste-btn-primary {
+.editorial-btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  background-color: #09090b;
-  color: #ffffff;
-  transition: all 150ms ease-out;
+  padding: 0.625rem 1.5rem;
+  border-radius: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  background-color: transparent;
+  color: #171615;
+  border: 1px solid #d6d3cd;
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.taste-btn-primary:hover {
-  background-color: #27272a;
-}
-.taste-btn-primary:active {
-  transform: scale(0.98);
-}
-
-.taste-btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+.editorial-btn-ghost:hover {
+  border-color: #0c0b0a;
   background-color: #ffffff;
-  color: #18181b;
-  border: 1px solid #e4e4e7;
-  transition: all 150ms ease-out;
 }
-.taste-btn-secondary:hover {
-  background-color: #f4f4f5;
-  border-color: #d4d4d8;
-}
-.taste-btn-secondary:active {
-  transform: scale(0.98);
+.editorial-btn-ghost:active {
+  transform: scale(0.99);
 }
 
-/* Glass Panels (Restrained) */
-.glass-panel {
-  background: #ffffff;
-  border: 1px solid #e4e4e7;
+/* Hairline dividers */
+.hairline-b {
+  border-bottom: 1px solid #e7e5e0;
 }
-
-.glass-blue {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-}
-
-.glass-dark {
-  background: #09090b;
-  border: 1px solid #27272a;
-}
-
-/* Button Standout - Clean minimal engineering button */
-.btn-standout {
-  background-color: #09090b;
-  color: #ffffff;
-  border: 1px solid #18181b;
-  transition: all 150ms ease-out;
-}
-
-.btn-standout:hover {
-  background-color: #27272a;
-}
-
-.btn-standout:active {
-  transform: scale(0.98);
+.hairline-dark-b {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Focus visible styling */
@@ -128,21 +106,20 @@ body {
 }
 .focus-ring:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #a1a1aa;
+  box-shadow: 0 0 0 1px #c5a059;
 }
 
-/* Clean Single-color Minimal Scrollbar */
+/* Single-color Refined Scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #fafafa;
+  background: #fbfaf6;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
-  border-radius: 9999px;
+  background: #d6d3cd;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1aa;
+  background: #c5a059;
 }

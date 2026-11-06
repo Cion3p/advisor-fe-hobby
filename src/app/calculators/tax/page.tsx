@@ -122,38 +122,38 @@ export default function TaxCalculatorPage() {
   ]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       {/* Header */}
-      <div className="text-center max-w-2xl mx-auto space-y-2">
-        <div className="inline-flex items-center gap-1.5 text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200">
-          <Receipt className="w-3.5 h-3.5 text-zinc-500" />
-          <span>TAX CALCULATOR 2567 - 2568</span>
+      <div className="text-center max-w-2xl mx-auto space-y-3">
+        <div className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.25em] px-3 py-1 rounded-none bg-stone-100 text-[#8c6d46] border border-stone-300">
+          <Receipt className="w-3.5 h-3.5 text-[#c5a059]" />
+          <span>TAX PLANNING ARCHITECTURE 2567 - 2568</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-stone-900 tracking-tight leading-tight">
           คำนวณภาษี & วางแผนลดหย่อนครบวงจร
         </h1>
-        <p className="text-xs sm:text-sm text-zinc-500">
+        <p className="text-xs sm:text-sm text-stone-600 font-light leading-relaxed">
           คำนวณสิทธิประโยชน์ทางภาษีได้ทั้งแบบมาตรฐานเฉพาะเบี้ยประกัน หรือเปิดตัวเลือกเสริมเพื่อคำนวณลดหย่อนอื่นๆ ละเอียดตามเกณฑ์กรมสรรพากร
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
         {/* Left Form: Inputs (7 cols) */}
-        <div className="lg:col-span-7 bg-white p-5 sm:p-7 rounded-xl border border-zinc-200 space-y-6">
+        <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-none border border-stone-200/80 space-y-7 shadow-xs">
           
           {/* Section 1: Income */}
-          <div className="space-y-3.5">
-            <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500 flex items-center justify-between border-b border-zinc-100 pb-2">
-              <span className="flex items-center gap-1.5">
-                <span className="w-5 h-5 rounded-full bg-zinc-100 text-zinc-800 flex items-center justify-center text-[11px] font-bold">1</span>
+          <div className="space-y-4">
+            <h2 className="text-xs font-mono uppercase tracking-[0.2em] text-stone-500 flex items-center justify-between border-b border-stone-100 pb-3">
+              <span className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-none bg-[#0c0b0a] text-stone-100 flex items-center justify-center text-[10px] font-bold">1</span>
                 <span>รายได้พึงประเมิน ม.40(1)</span>
               </span>
             </h2>
 
             <div>
-              <div className="flex justify-between items-center text-xs font-medium mb-1">
-                <span className="text-zinc-700">รายได้เฉลี่ยต่อเดือน (บาท)</span>
-                <span className="font-mono font-bold text-zinc-900 text-base">
+              <div className="flex justify-between items-center text-xs font-medium mb-1.5">
+                <span className="text-stone-700">รายได้เฉลี่ยต่อเดือน (บาท)</span>
+                <span className="font-mono font-bold text-stone-900 text-lg">
                   ฿{monthlyIncome.toLocaleString()}
                 </span>
               </div>
@@ -164,11 +164,11 @@ export default function TaxCalculatorPage() {
                 step="5000"
                 value={monthlyIncome}
                 onChange={(e) => setMonthlyIncome(Number(e.target.value))}
-                className="w-full accent-zinc-900 h-1.5 bg-zinc-100 rounded-lg cursor-pointer"
+                className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] font-mono text-zinc-400 mt-1">
+              <div className="flex justify-between text-[10px] font-mono text-stone-400 mt-1.5">
                 <span>15,000 บ.</span>
-                <span className="text-zinc-600">รวมทั้งปี: ฿{annualIncome.toLocaleString()} บาท</span>
+                <span className="text-[#8c6d46] font-medium">รวมทั้งปี: ฿{annualIncome.toLocaleString()} บาท</span>
                 <span>300,000+ บ.</span>
               </div>
             </div>
@@ -176,21 +176,21 @@ export default function TaxCalculatorPage() {
 
           {/* Section 2: Proposed Insurance */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-              <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
-                <span className="w-5 h-5 rounded-full bg-zinc-100 text-zinc-800 flex items-center justify-center text-[11px] font-bold">2</span>
+            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+              <h2 className="text-xs font-mono uppercase tracking-[0.2em] text-stone-500 flex items-center gap-2">
+                <span className="w-5 h-5 rounded-none bg-[#0c0b0a] text-stone-100 flex items-center justify-center text-[10px] font-bold">2</span>
                 <span>เบี้ยประกันที่วางแผนซื้อลดหย่อน</span>
               </h2>
             </div>
 
             {/* Proposed Health */}
-            <div className="space-y-1 bg-zinc-50 p-3.5 rounded-lg border border-zinc-200/80">
+            <div className="space-y-1.5 bg-stone-50/70 p-4 rounded-none border border-stone-200">
               <div className="flex justify-between items-center text-xs font-medium">
                 <div>
-                  <span className="text-zinc-800 font-bold block">ประกันสุขภาพ</span>
-                  <span className="text-[10px] font-mono text-zinc-400">ลดหย่อนได้สูงสุด 25,000 บาท/ปี</span>
+                  <span className="text-stone-900 font-serif font-bold text-sm block">ประกันสุขภาพ</span>
+                  <span className="text-[10px] font-mono text-stone-500">ลดหย่อนได้สูงสุด 25,000 บาท/ปี</span>
                 </div>
-                <span className="font-mono font-bold text-zinc-900 text-sm">฿{proposedHealth.toLocaleString()}</span>
+                <span className="font-mono font-bold text-stone-900 text-base">฿{proposedHealth.toLocaleString()}</span>
               </div>
               <input
                 type="range"
@@ -199,22 +199,22 @@ export default function TaxCalculatorPage() {
                 step="2500"
                 value={proposedHealth}
                 onChange={(e) => setProposedHealth(Number(e.target.value))}
-                className="w-full accent-zinc-900 h-1.5 bg-zinc-200 rounded-lg cursor-pointer"
+                className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] font-mono text-zinc-400">
+              <div className="flex justify-between text-[10px] font-mono text-stone-400">
                 <span>0</span>
                 <span>25,000</span>
               </div>
             </div>
 
             {/* Proposed Life */}
-            <div className="space-y-1 bg-zinc-50 p-3.5 rounded-lg border border-zinc-200/80">
+            <div className="space-y-1.5 bg-stone-50/70 p-4 rounded-none border border-stone-200">
               <div className="flex justify-between items-center text-xs font-medium">
                 <div>
-                  <span className="text-zinc-800 font-bold block">ประกันชีวิตทั่วไป / สะสมทรัพย์</span>
-                  <span className="text-[10px] font-mono text-zinc-400">เพดานสูงสุด 100,000 บาท (รวมสุขภาพ)</span>
+                  <span className="text-stone-900 font-serif font-bold text-sm block">ประกันชีวิตทั่วไป / สะสมทรัพย์</span>
+                  <span className="text-[10px] font-mono text-stone-500">เพดานสูงสุด 100,000 บาท (รวมสุขภาพ)</span>
                 </div>
-                <span className="font-mono font-bold text-zinc-900 text-sm">฿{proposedLife.toLocaleString()}</span>
+                <span className="font-mono font-bold text-stone-900 text-base">฿{proposedLife.toLocaleString()}</span>
               </div>
               <input
                 type="range"
@@ -223,233 +223,201 @@ export default function TaxCalculatorPage() {
                 step="5000"
                 value={proposedLife}
                 onChange={(e) => setProposedLife(Number(e.target.value))}
-                className="w-full accent-zinc-900 h-1.5 bg-zinc-200 rounded-lg cursor-pointer"
+                className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] font-mono text-zinc-400">
+              <div className="flex justify-between text-[10px] font-mono text-stone-400">
                 <span>0</span>
                 <span>100,000</span>
               </div>
             </div>
 
             {/* Proposed Pension */}
-            <div className="space-y-1 bg-zinc-50 p-3.5 rounded-lg border border-zinc-200/80">
+            <div className="space-y-1.5 bg-stone-50/70 p-4 rounded-none border border-stone-200">
               <div className="flex justify-between items-center text-xs font-medium">
                 <div>
-                  <span className="text-zinc-800 font-bold block">ประกันบำนาญ (Annuity)</span>
-                  <span className="text-[10px] font-mono text-zinc-400">สูงสุด 15% ของเงินได้ แต่ไม่เกิน 200,000 บาท</span>
+                  <span className="text-stone-900 font-serif font-bold text-sm block">ประกันบำนาญ (Annuity)</span>
+                  <span className="text-[10px] font-mono text-stone-500">สูงสุด 15% ของเงินได้ แต่ไม่เกิน 200,000 บาท</span>
                 </div>
-                <span className="font-mono font-bold text-zinc-900 text-sm">฿{proposedPension.toLocaleString()}</span>
+                <span className="font-mono font-bold text-stone-900 text-base">฿{proposedPension.toLocaleString()}</span>
               </div>
               <input
                 type="range"
                 min="0"
-                max={Math.min(annualIncome * 0.15, 200000)}
-                step="5000"
+                max="200000"
+                step="10000"
                 value={proposedPension}
                 onChange={(e) => setProposedPension(Number(e.target.value))}
-                className="w-full accent-zinc-900 h-1.5 bg-zinc-200 rounded-lg cursor-pointer"
+                className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] font-mono text-zinc-400">
+              <div className="flex justify-between text-[10px] font-mono text-stone-400">
                 <span>0</span>
-                <span>{Math.min(annualIncome * 0.15, 200000).toLocaleString()}</span>
+                <span>200,000</span>
               </div>
             </div>
           </div>
 
-          {/* Existing Insurance Toggle */}
-          <div className="pt-2 border-t border-zinc-100">
+          {/* Section: Existing Insurance Toggle */}
+          <div className="pt-2 border-t border-stone-100">
             <button
               type="button"
               onClick={() => setShowExistingInsurance(!showExistingInsurance)}
-              className="flex items-center justify-between w-full text-xs font-medium text-zinc-600 hover:text-zinc-900 py-2 transition-colors duration-150"
+              className="flex items-center justify-between w-full text-xs font-mono uppercase tracking-wider text-stone-600 hover:text-stone-900 py-2 cursor-pointer"
             >
-              <span className="flex items-center gap-1.5">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" />
-                <span>ฉันมีประกันที่ซื้อไว้แล้วอยู่ก่อนหน้านี้ (ระบุเพิ่มเติม)</span>
-              </span>
-              {showExistingInsurance ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              <span>+ มีประกันที่ทำไว้อยู่แล้ว (คำนวณร่วมกับสิทธิเดิม)</span>
+              {showExistingInsurance ? <ChevronUp className="w-4 h-4 text-[#c5a059]" /> : <ChevronDown className="w-4 h-4 text-stone-400" />}
             </button>
 
             {showExistingInsurance && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] text-zinc-500 font-medium">ประกันชีวิตเดิม</label>
-                  <input
-                    type="number"
-                    value={existingLife || ''}
-                    onChange={(e) => setExistingLife(Number(e.target.value))}
-                    placeholder="0"
-                    className="w-full h-9 px-3 rounded-lg border border-zinc-200 text-xs font-mono focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] text-zinc-500 font-medium">ประกันสุขภาพเดิม</label>
-                  <input
-                    type="number"
-                    value={existingHealth || ''}
-                    onChange={(e) => setExistingHealth(Number(e.target.value))}
-                    placeholder="0"
-                    className="w-full h-9 px-3 rounded-lg border border-zinc-200 text-xs font-mono focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] text-zinc-500 font-medium">ประกันบำนาญเดิม</label>
-                  <input
-                    type="number"
-                    value={existingPension || ''}
-                    onChange={(e) => setExistingPension(Number(e.target.value))}
-                    placeholder="0"
-                    className="w-full h-9 px-3 rounded-lg border border-zinc-200 text-xs font-mono focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none"
-                  />
+              <div className="space-y-3 pt-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-[11px] text-stone-500 block mb-1">ชีวิตเดิม (บาท)</label>
+                    <input
+                      type="number"
+                      value={existingLife}
+                      onChange={(e) => setExistingLife(Number(e.target.value))}
+                      className="w-full h-9 px-3 border border-stone-300 rounded-none text-xs font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-stone-500 block mb-1">สุขภาพเดิม (บาท)</label>
+                    <input
+                      type="number"
+                      value={existingHealth}
+                      onChange={(e) => setExistingHealth(Number(e.target.value))}
+                      className="w-full h-9 px-3 border border-stone-300 rounded-none text-xs font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-stone-500 block mb-1">บำนาญเดิม (บาท)</label>
+                    <input
+                      type="number"
+                      value={existingPension}
+                      onChange={(e) => setExistingPension(Number(e.target.value))}
+                      className="w-full h-9 px-3 border border-stone-300 rounded-none text-xs font-mono"
+                    />
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Section 3: Detailed Deductions */}
-          <div className="pt-2 border-t border-zinc-100">
+          {/* Section 3: Advanced Detailed Deductions Toggle */}
+          <div className="pt-3 border-t border-stone-100">
             <button
               type="button"
               onClick={() => setShowDetailedDeductions(!showDetailedDeductions)}
-              className="flex items-center justify-between w-full text-xs font-medium text-zinc-600 hover:text-zinc-900 py-2 transition-colors duration-150"
+              className="flex items-center justify-between w-full text-xs font-mono uppercase tracking-wider text-[#8c6d46] hover:text-stone-900 py-2 cursor-pointer font-semibold"
             >
               <span className="flex items-center gap-1.5">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" />
-                <span>คำนวณแบบละเอียด (กองทุน ThaiESG, ดอกเบี้ยบ้าน, ประกันสังคม, ครอบครัว)</span>
+                <SlidersHorizontal className="w-3.5 h-3.5 text-[#c5a059]" />
+                <span>เปิดตัวเลือกหักลดหย่อนอื่นๆ ละเอียด (ครอบครัว, กองทุน, ดอกเบี้ยบ้าน)</span>
               </span>
-              {showDetailedDeductions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              {showDetailedDeductions ? <ChevronUp className="w-4 h-4 text-[#c5a059]" /> : <ChevronDown className="w-4 h-4 text-stone-400" />}
             </button>
 
             {showDetailedDeductions && (
               <div className="space-y-4 pt-3">
                 {/* Tabs */}
-                <div className="grid grid-cols-4 gap-1.5 p-1 bg-zinc-100 rounded-lg">
-                  <button
-                    type="button"
-                    onClick={() => setActiveDeductionTab('family')}
-                    className={`py-1.5 text-xs font-medium rounded-md transition-colors duration-150 ${
-                      activeDeductionTab === 'family'
-                        ? 'bg-white text-zinc-900 shadow-xs'
-                        : 'text-zinc-600 hover:text-zinc-900'
-                    }`}
-                  >
-                    ครอบครัว
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveDeductionTab('investment')}
-                    className={`py-1.5 text-xs font-medium rounded-md transition-colors duration-150 ${
-                      activeDeductionTab === 'investment'
-                        ? 'bg-white text-zinc-900 shadow-xs'
-                        : 'text-zinc-600 hover:text-zinc-900'
-                    }`}
-                  >
-                    กองทุน
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveDeductionTab('property')}
-                    className={`py-1.5 text-xs font-medium rounded-md transition-colors duration-150 ${
-                      activeDeductionTab === 'property'
-                        ? 'bg-white text-zinc-900 shadow-xs'
-                        : 'text-zinc-600 hover:text-zinc-900'
-                    }`}
-                  >
-                    บ้าน & ช้อปปิ้ง
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveDeductionTab('donation')}
-                    className={`py-1.5 text-xs font-medium rounded-md transition-colors duration-150 ${
-                      activeDeductionTab === 'donation'
-                        ? 'bg-white text-zinc-900 shadow-xs'
-                        : 'text-zinc-600 hover:text-zinc-900'
-                    }`}
-                  >
-                    บริจาค
-                  </button>
+                <div className="flex border-b border-stone-200 text-xs font-mono">
+                  {[
+                    { id: 'family', label: 'ครอบครัว & สังคม', icon: Users },
+                    { id: 'investment', label: 'ThaiESG & กองทุน', icon: PiggyBank },
+                    { id: 'property', label: 'บ้าน & มาตรการรัฐ', icon: Home },
+                    { id: 'donation', label: 'บริจาค', icon: Gift },
+                  ].map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeDeductionTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setActiveDeductionTab(tab.id as any)}
+                        className={`flex items-center gap-1.5 py-2.5 px-3 border-b-2 tracking-wider transition-colors duration-150 cursor-pointer ${
+                          isActive
+                            ? 'border-[#c5a059] text-stone-900 font-bold bg-stone-50/50'
+                            : 'border-transparent text-stone-500 hover:text-stone-800'
+                        }`}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">{tab.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* Tab 1: Family */}
                 {activeDeductionTab === 'family' && (
-                  <div className="space-y-3 bg-zinc-50 p-4 rounded-lg border border-zinc-200">
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="font-medium text-zinc-800">เงินสมทบประกันสังคม (สูงสุด 9,000)</span>
-                        <span className="font-mono font-bold text-zinc-900">฿{socialSecurity.toLocaleString()}</span>
+                  <div className="space-y-3 bg-stone-50/70 p-4 rounded-none border border-stone-200">
+                    <div>
+                      <div className="flex justify-between items-center text-xs mb-1">
+                        <span className="font-medium text-stone-800">ประกันสังคมต่อปี (สูงสุด 9,000)</span>
+                        <span className="font-mono font-bold text-stone-900">฿{socialSecurity.toLocaleString()}</span>
                       </div>
                       <input
                         type="range"
                         min="0"
                         max="9000"
-                        step="500"
+                        step="750"
                         value={socialSecurity}
                         onChange={(e) => setSocialSecurity(Number(e.target.value))}
-                        className="w-full accent-zinc-900 h-1.5 bg-zinc-200 rounded-lg cursor-pointer"
+                        className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
                       />
                     </div>
 
-                    <div className="pt-2 border-t border-zinc-200/60 flex items-center justify-between text-xs">
-                      <span className="text-zinc-700">คู่สมรสไม่มีเงินได้ (ลดหย่อน 60,000)</span>
+                    <div className="pt-2 border-t border-stone-200/60 flex items-center justify-between text-xs">
+                      <span className="text-stone-800">คู่สมรสไม่มีเงินได้ (ลดหย่อน 60,000 บ.)</span>
                       <input
                         type="checkbox"
                         checked={spouseAllowance}
                         onChange={(e) => setSpouseAllowance(e.target.checked)}
-                        className="w-4 h-4 rounded text-zinc-900 border-zinc-300 focus:ring-zinc-400 cursor-pointer"
+                        className="w-4 h-4 accent-[#c5a059] rounded-none cursor-pointer"
                       />
                     </div>
 
-                    <div className="pt-2 border-t border-zinc-200/60 flex items-center justify-between text-xs">
-                      <span className="text-zinc-700">จำนวนบุตร (คนละ 30,000)</span>
-                      <div className="flex items-center gap-2">
+                    <div className="pt-2 border-t border-stone-200/60 flex items-center justify-between text-xs">
+                      <span className="text-stone-800">จำนวนบุตร (ลดหย่อน 30,000 บ./คน)</span>
+                      <div className="flex items-center gap-2 font-mono">
                         <button
                           type="button"
                           onClick={() => setChildrenCount(Math.max(0, childrenCount - 1))}
-                          className="w-6 h-6 rounded border border-zinc-200 bg-white flex items-center justify-center text-zinc-600"
-                        >
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="w-4 text-center font-mono font-bold">{childrenCount}</span>
+                          className="w-6 h-6 border border-stone-300 rounded-none flex items-center justify-center hover:bg-stone-100"
+                        >-</button>
+                        <span className="w-5 text-center font-bold">{childrenCount}</span>
                         <button
                           type="button"
                           onClick={() => setChildrenCount(childrenCount + 1)}
-                          className="w-6 h-6 rounded border border-zinc-200 bg-white flex items-center justify-center text-zinc-600"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
+                          className="w-6 h-6 border border-stone-300 rounded-none flex items-center justify-center hover:bg-stone-100"
+                        >+</button>
                       </div>
                     </div>
 
-                    <div className="pt-2 border-t border-zinc-200/60 flex items-center justify-between text-xs">
-                      <span className="text-zinc-700">อุปการะบิดา-มารดา (คนละ 30,000)</span>
-                      <div className="flex items-center gap-2">
+                    <div className="pt-2 border-t border-stone-200/60 flex items-center justify-between text-xs">
+                      <span className="text-stone-800">อุปการะบิดามารดา (30,000 บ./คน, อายุ 60+)</span>
+                      <div className="flex items-center gap-2 font-mono">
                         <button
                           type="button"
                           onClick={() => setParentsCount(Math.max(0, parentsCount - 1))}
-                          className="w-6 h-6 rounded border border-zinc-200 bg-white flex items-center justify-center text-zinc-600"
-                        >
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="w-4 text-center font-mono font-bold">{parentsCount}</span>
+                          className="w-6 h-6 border border-stone-300 rounded-none flex items-center justify-center hover:bg-stone-100"
+                        >-</button>
+                        <span className="w-5 text-center font-bold">{parentsCount}</span>
                         <button
                           type="button"
                           onClick={() => setParentsCount(Math.min(4, parentsCount + 1))}
-                          className="w-6 h-6 rounded border border-zinc-200 bg-white flex items-center justify-center text-zinc-600"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
+                          className="w-6 h-6 border border-stone-300 rounded-none flex items-center justify-center hover:bg-stone-100"
+                        >+</button>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Tab 2: Investments */}
+                {/* Tab 2: Investment */}
                 {activeDeductionTab === 'investment' && (
-                  <div className="space-y-3 bg-zinc-50 p-4 rounded-lg border border-zinc-200">
+                  <div className="space-y-3 bg-stone-50/70 p-4 rounded-none border border-stone-200">
                     <div className="space-y-1">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-medium text-zinc-800">กองทุน ThaiESG (สูงสุด 300,000)</span>
-                        <span className="font-mono font-bold text-zinc-900">฿{thaiEsg.toLocaleString()}</span>
+                        <span className="font-medium text-stone-800">กองทุน ThaiESG (สูงสุด 300,000)</span>
+                        <span className="font-mono font-bold text-stone-900">฿{thaiEsg.toLocaleString()}</span>
                       </div>
                       <input
                         type="range"
@@ -458,14 +426,14 @@ export default function TaxCalculatorPage() {
                         step="10000"
                         value={thaiEsg}
                         onChange={(e) => setThaiEsg(Number(e.target.value))}
-                        className="w-full accent-zinc-900 h-1.5 bg-zinc-200 rounded-lg cursor-pointer"
+                        className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
                       />
                     </div>
 
-                    <div className="space-y-1 pt-2 border-t border-zinc-200/60">
+                    <div className="space-y-1 pt-2 border-t border-stone-200/60">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-medium text-zinc-800">RMF / PVD / กบข. / SSF</span>
-                        <span className="font-mono font-bold text-zinc-900">฿{rmfPvdSsf.toLocaleString()}</span>
+                        <span className="font-medium text-stone-800">RMF / PVD / กบข. / SSF</span>
+                        <span className="font-mono font-bold text-stone-900">฿{rmfPvdSsf.toLocaleString()}</span>
                       </div>
                       <input
                         type="range"
@@ -474,7 +442,7 @@ export default function TaxCalculatorPage() {
                         step="10000"
                         value={rmfPvdSsf}
                         onChange={(e) => setRmfPvdSsf(Number(e.target.value))}
-                        className="w-full accent-zinc-900 h-1.5 bg-zinc-200 rounded-lg cursor-pointer"
+                        className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
                       />
                     </div>
                   </div>
@@ -482,11 +450,11 @@ export default function TaxCalculatorPage() {
 
                 {/* Tab 3: Property */}
                 {activeDeductionTab === 'property' && (
-                  <div className="space-y-3 bg-zinc-50 p-4 rounded-lg border border-zinc-200">
+                  <div className="space-y-3 bg-stone-50/70 p-4 rounded-none border border-stone-200">
                     <div className="space-y-1">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-medium text-zinc-800">ดอกเบี้ยเงินกู้ซื้อบ้าน (สูงสุด 100,000)</span>
-                        <span className="font-mono font-bold text-zinc-900">฿{mortgageInterest.toLocaleString()}</span>
+                        <span className="font-medium text-stone-800">ดอกเบี้ยเงินกู้ซื้อบ้าน (สูงสุด 100,000)</span>
+                        <span className="font-mono font-bold text-stone-900">฿{mortgageInterest.toLocaleString()}</span>
                       </div>
                       <input
                         type="range"
@@ -495,14 +463,14 @@ export default function TaxCalculatorPage() {
                         step="5000"
                         value={mortgageInterest}
                         onChange={(e) => setMortgageInterest(Number(e.target.value))}
-                        className="w-full accent-zinc-900 h-1.5 bg-zinc-200 rounded-lg cursor-pointer"
+                        className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
                       />
                     </div>
 
-                    <div className="space-y-1 pt-2 border-t border-zinc-200/60">
+                    <div className="space-y-1 pt-2 border-t border-stone-200/60">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-medium text-zinc-800">Easy E-Receipt (สูงสุด 50,000)</span>
-                        <span className="font-mono font-bold text-zinc-900">฿{easyEReceipt.toLocaleString()}</span>
+                        <span className="font-medium text-stone-800">Easy E-Receipt (สูงสุด 50,000)</span>
+                        <span className="font-mono font-bold text-stone-900">฿{easyEReceipt.toLocaleString()}</span>
                       </div>
                       <input
                         type="range"
@@ -511,7 +479,7 @@ export default function TaxCalculatorPage() {
                         step="5000"
                         value={easyEReceipt}
                         onChange={(e) => setEasyEReceipt(Number(e.target.value))}
-                        className="w-full accent-zinc-900 h-1.5 bg-zinc-200 rounded-lg cursor-pointer"
+                        className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
                       />
                     </div>
                   </div>
@@ -519,11 +487,11 @@ export default function TaxCalculatorPage() {
 
                 {/* Tab 4: Donation */}
                 {activeDeductionTab === 'donation' && (
-                  <div className="space-y-3 bg-zinc-50 p-4 rounded-lg border border-zinc-200">
+                  <div className="space-y-3 bg-stone-50/70 p-4 rounded-none border border-stone-200">
                     <div className="space-y-1">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-medium text-zinc-800">บริจาคการศึกษา / โรงพยาบาล (2 เท่า)</span>
-                        <span className="font-mono font-bold text-zinc-900">฿{educationDonation.toLocaleString()}</span>
+                        <span className="font-medium text-stone-800">บริจาคการศึกษา / โรงพยาบาล (2 เท่า)</span>
+                        <span className="font-mono font-bold text-stone-900">฿{educationDonation.toLocaleString()}</span>
                       </div>
                       <input
                         type="range"
@@ -532,14 +500,14 @@ export default function TaxCalculatorPage() {
                         step="2000"
                         value={educationDonation}
                         onChange={(e) => setEducationDonation(Number(e.target.value))}
-                        className="w-full accent-zinc-900 h-1.5 bg-zinc-200 rounded-lg cursor-pointer"
+                        className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
                       />
                     </div>
 
-                    <div className="space-y-1 pt-2 border-t border-zinc-200/60">
+                    <div className="space-y-1 pt-2 border-t border-stone-200/60">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-medium text-zinc-800">บริจาคทั่วไป</span>
-                        <span className="font-mono font-bold text-zinc-900">฿{generalDonation.toLocaleString()}</span>
+                        <span className="font-medium text-stone-800">บริจาคทั่วไป</span>
+                        <span className="font-mono font-bold text-stone-900">฿{generalDonation.toLocaleString()}</span>
                       </div>
                       <input
                         type="range"
@@ -548,7 +516,7 @@ export default function TaxCalculatorPage() {
                         step="1000"
                         value={generalDonation}
                         onChange={(e) => setGeneralDonation(Number(e.target.value))}
-                        className="w-full accent-zinc-900 h-1.5 bg-zinc-200 rounded-lg cursor-pointer"
+                        className="w-full accent-[#c5a059] h-1.5 bg-stone-200 rounded-none cursor-pointer"
                       />
                     </div>
                   </div>
@@ -559,23 +527,23 @@ export default function TaxCalculatorPage() {
 
         </div>
 
-        {/* Right Panel: Results Card (5 cols) - Dark Engineering Aesthetics */}
-        <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-24">
-          <div className="bg-[#09090b] text-white p-5 sm:p-6 rounded-xl border border-zinc-800 space-y-5">
-            <div className="border-b border-zinc-800 pb-4">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 block">
+        {/* Right Panel: Results Card (5 cols) - Obsidian High-End Editorial Style */}
+        <div className="lg:col-span-5 space-y-5 lg:sticky lg:top-24">
+          <div className="bg-[#0c0b0a] text-stone-100 p-6 sm:p-7 rounded-none border border-stone-800 space-y-6 shadow-xl">
+            <div className="border-b border-stone-800 pb-5">
+              <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#c5a059] block">
                 TAX REDUCTION SUMMARY
               </span>
-              <div className="mt-2 flex items-baseline justify-between">
+              <div className="mt-3 flex items-baseline justify-between">
                 <div>
-                  <span className="text-[11px] font-mono text-zinc-400 block">ประหยัดภาษีได้</span>
-                  <span className="text-3xl sm:text-4xl font-mono font-bold text-emerald-400">
+                  <span className="text-[11px] font-mono text-stone-400 block uppercase">ประหยัดภาษีได้</span>
+                  <span className="text-3xl sm:text-4xl font-serif font-bold text-[#c5a059]">
                     ฿{result ? result.taxSaved.toLocaleString() : '0'}
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[11px] font-mono text-zinc-400 block">ฐานภาษีสูงสุด</span>
-                  <span className="text-lg font-mono font-bold text-zinc-200">
+                  <span className="text-[11px] font-mono text-stone-400 block uppercase">ฐานภาษีสูงสุด</span>
+                  <span className="text-xl font-mono font-bold text-stone-200">
                     {result ? result.marginalTaxRate : 0}%
                   </span>
                 </div>
@@ -584,50 +552,50 @@ export default function TaxCalculatorPage() {
 
             {/* Breakdown summary */}
             {result && (
-              <div className="space-y-2 text-xs font-mono text-zinc-300">
-                <div className="flex justify-between py-1 border-b border-zinc-800/80">
-                  <span className="text-zinc-400 font-sans text-xs">รายได้พึงประเมินทั้งปี:</span>
-                  <span className="font-bold text-white">฿{result.annualIncome.toLocaleString()}</span>
+              <div className="space-y-2.5 text-xs font-mono text-stone-300">
+                <div className="flex justify-between py-1.5 border-b border-stone-800/80">
+                  <span className="text-stone-400 font-sans text-xs">รายได้พึงประเมินทั้งปี:</span>
+                  <span className="font-bold text-stone-100">฿{result.annualIncome.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-zinc-800/80">
-                  <span className="text-zinc-400 font-sans text-xs">หักค่าใช้จ่าย 50%:</span>
-                  <span className="text-zinc-300">- ฿{result.standardExpenseDeduction.toLocaleString()}</span>
+                <div className="flex justify-between py-1.5 border-b border-stone-800/80">
+                  <span className="text-stone-400 font-sans text-xs">หักค่าใช้จ่าย 50%:</span>
+                  <span className="text-stone-300">- ฿{result.standardExpenseDeduction.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-zinc-800/80">
-                  <span className="text-zinc-400 font-sans text-xs">ค่าลดหย่อนส่วนตัว:</span>
-                  <span className="text-zinc-300">- ฿{result.personalDeduction.toLocaleString()}</span>
+                <div className="flex justify-between py-1.5 border-b border-stone-800/80">
+                  <span className="text-stone-400 font-sans text-xs">ค่าลดหย่อนส่วนตัว:</span>
+                  <span className="text-stone-300">- ฿{result.personalDeduction.toLocaleString()}</span>
                 </div>
 
                 {showDetailedDeductions && (result.totalOtherDeductions || 0) > 0 && (
-                  <div className="flex justify-between py-1 border-b border-zinc-800/80 text-zinc-300">
+                  <div className="flex justify-between py-1.5 border-b border-stone-800/80 text-stone-300">
                     <span className="font-sans text-xs">ลดหย่อนอื่นๆ เพิ่มเติม:</span>
                     <span>- ฿{result.totalOtherDeductions?.toLocaleString()}</span>
                   </div>
                 )}
 
-                <div className="flex justify-between py-1 border-b border-zinc-800/80">
-                  <span className="text-zinc-400 font-sans text-xs">ลดหย่อนประกันที่ใช้:</span>
-                  <span className="text-emerald-400 font-bold">- ฿{result.totalInsuranceDeductionsAfter.toLocaleString()}</span>
+                <div className="flex justify-between py-1.5 border-b border-stone-800/80">
+                  <span className="text-stone-400 font-sans text-xs">ลดหย่อนประกันที่ใช้:</span>
+                  <span className="text-[#c5a059] font-bold">- ฿{result.totalInsuranceDeductionsAfter.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-zinc-800/80">
-                  <span className="text-zinc-400 font-sans text-xs">เงินได้สุทธิหลังลดหย่อน:</span>
-                  <span className="font-bold text-white">฿{result.netTaxableIncomeAfter.toLocaleString()}</span>
+                <div className="flex justify-between py-1.5 border-b border-stone-800/80">
+                  <span className="text-stone-400 font-sans text-xs">เงินได้สุทธิหลังลดหย่อน:</span>
+                  <span className="font-bold text-stone-100">฿{result.netTaxableIncomeAfter.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-zinc-800/80">
-                  <span className="text-zinc-400 font-sans text-xs">ภาษีเดิมก่อนซื้อประกัน:</span>
-                  <span className="text-zinc-500 line-through">฿{result.totalTaxBefore.toLocaleString()}</span>
+                <div className="flex justify-between py-1.5 border-b border-stone-800/80">
+                  <span className="text-stone-400 font-sans text-xs">ภาษีเดิมก่อนซื้อประกัน:</span>
+                  <span className="text-stone-500 line-through">฿{result.totalTaxBefore.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between py-1 pt-1.5 text-xs font-bold text-white">
+                <div className="flex justify-between py-2 text-xs font-bold text-stone-100">
                   <span className="font-sans">ภาษีที่ต้องจ่ายจริง:</span>
-                  <span className="text-emerald-400 text-sm">฿{result.totalTaxAfter.toLocaleString()}</span>
+                  <span className="text-[#c5a059] text-base font-serif">฿{result.totalTaxAfter.toLocaleString()}</span>
                 </div>
               </div>
             )}
 
-            <div className="pt-1">
+            <div className="pt-2">
               <Link
                 href="/products?tax=true"
-                className="w-full h-10 flex items-center justify-center gap-2 bg-zinc-100 hover:bg-white text-zinc-900 font-medium rounded-lg active:scale-[0.98] transition duration-150 text-xs text-center cursor-pointer"
+                className="w-full h-11 flex items-center justify-center gap-2 bg-[#c5a059] hover:bg-[#d8b56f] text-stone-950 font-mono font-semibold uppercase tracking-wider rounded-none transition duration-200 text-xs text-center cursor-pointer"
               >
                 <span>ดูแผนประกันลดหย่อนภาษีที่แนะนำ</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -635,12 +603,12 @@ export default function TaxCalculatorPage() {
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-zinc-200 text-xs text-zinc-600 space-y-1.5">
-            <h3 className="font-bold text-zinc-900 flex items-center gap-1.5 text-xs">
-              <Info className="w-3.5 h-3.5 text-zinc-500" />
-              <span>หมายเหตุการคำนวณ:</span>
+          <div className="bg-white p-5 rounded-none border border-stone-200 text-xs text-stone-600 space-y-2">
+            <h3 className="font-serif font-bold text-stone-900 flex items-center gap-1.5 text-xs">
+              <Info className="w-3.5 h-3.5 text-[#c5a059]" />
+              <span>หมายเหตุการคำนวณตามเกณฑ์สรรพากร:</span>
             </h3>
-            <ul className="list-disc pl-4 space-y-0.5 text-zinc-500 text-[11px] leading-relaxed">
+            <ul className="list-disc pl-4 space-y-1 text-stone-500 text-[11px] leading-relaxed font-light">
               <li>หักค่าใช้จ่าย 50% สูงสุด 100,000 บ. และลดหย่อนส่วนตัว 60,000 บ. (ม.40(1))</li>
               <li>เบี้ยประกันชีวิตทั่วไป/สะสมทรัพย์ สูงสุด 100,000 บ. (รวมสุขภาพไม่เกิน 25,000 บ.)</li>
               <li>เบี้ยประกันบำนาญ สูงสุด 15% ไม่เกิน 200,000 บ. (รวมเกษียณไม่เกิน 500,000 บ.)</li>

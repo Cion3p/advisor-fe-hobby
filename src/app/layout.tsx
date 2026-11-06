@@ -9,35 +9,28 @@ import { AnalyticsRouteTracker } from '@/components/common/AnalyticsRouteTracker
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
-    default: 'ModtanoyAdvisor | แพลตฟอร์มเปรียบเทียบประกันและวางแผนภาษีการเงินอัจฉริยะ',
+    default: 'ModtanoyAdvisor | แพลตฟอร์มเปรียบเทียบประกันและวางแผนภาษีการเงินระดับพรีเมียม',
     template: '%s | ModtanoyAdvisor',
   },
-  description: 'ModtanoyAdvisor (มดตะนอย แอดไวเซอร์) แพลตฟอร์มตัวกลางที่ช่วยคุณเปรียบเทียบประกันสุขภาพเหมาจ่าย ประกันชีวิต และวางแผนภาษี 2567 โปร่งใส เข้าใจง่าย โดยผู้เชี่ยวชาญ คปภ.',
+  description: 'ModtanoyAdvisor (มดตะนอย แอดไวเซอร์) สุนทรียศาสตร์แห่งการวางแผนประกันและมรดกครอบครัวชั้นสูง โปร่งใส เป็นกลาง โดยที่ปรึกษาการเงิน คปภ.',
   keywords: [
     'ModtanoyAdvisor',
     'มดตะนอย แอดไวเซอร์',
     'ประกันสุขภาพเหมาจ่าย',
-    'ประกันชีวิต',
+    'ประกันชีวิตมรดก',
     'ประกันบำนาญ',
     'ลดหย่อนภาษี 2567',
     'เปรียบเทียบประกัน',
-    'คำนวณภาษี',
+    'วางแผนการเงิน',
   ],
   authors: [{ name: 'ModtanoyAdvisor Financial Advisory Team' }],
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
   },
   openGraph: {
-    title: 'ModtanoyAdvisor | เปรียบเทียบประกันและวางแผนการเงิน',
-    description: 'มดตะนอย แอดไวเซอร์ - ตัวเล็กแต่ปกป้องคุณยิ่งใหญ่ เปรียบเทียบผลประโยชน์ชัดเจน ปรึกษาตัวแทนฟรี',
+    title: 'ModtanoyAdvisor | Luxury Advisory & Protection Showcase',
+    description: 'มดตะนอย แอดไวเซอร์ - สุนทรียศาสตร์แห่งการปกป้องและวางแผนมรดก',
     url: 'https://modtanoyadvisor.com',
     siteName: 'ModtanoyAdvisor',
     locale: 'th_TH',
@@ -59,7 +52,7 @@ export default function RootLayout({
     logo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/images/logo.png`,
     description: 'ศูนย์รวมเปรียบเทียบแผนประกันภัย วางแผนภาษี และผลิตภัณฑ์การเงินอัจฉริยะ',
     areaServed: 'TH',
-    priceRange: '฿฿',
+    priceRange: '฿฿฿',
   };
 
   return (
@@ -68,7 +61,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
           rel="stylesheet"
         />
         <script
@@ -76,7 +69,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>
-      <body className="font-sans flex flex-col min-h-screen bg-[#fafafa] antialiased text-zinc-900 selection:bg-zinc-900 selection:text-white">
+      <body className="font-sans flex flex-col min-h-screen bg-[#fbfaf6] antialiased text-stone-900 selection:bg-[#c5a059] selection:text-stone-950">
         <Suspense fallback={null}>
           <AnalyticsRouteTracker />
         </Suspense>

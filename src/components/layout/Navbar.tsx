@@ -5,13 +5,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   Shield, 
-  Calculator, 
-  BookOpen, 
   Menu, 
   X, 
-  PhoneCall, 
-  Layers,
-  Sparkles
+  ArrowRight
 } from 'lucide-react';
 
 export function Navbar() {
@@ -23,62 +19,64 @@ export function Navbar() {
   }
 
   const navLinks = [
-    { href: '/products', label: 'แผนประกันทั้งหมด', icon: Layers },
-    { href: '/calculators/tax', label: 'คำนวณภาษี', icon: Calculator },
-    { href: '/calculators/life-value', label: 'คำนวณทุนประกัน', icon: Calculator },
-    { href: '/quiz', label: 'ค้นหาแผนที่ใช่', icon: Sparkles },
-    { href: '/articles', label: 'สาระน่ารู้', icon: BookOpen },
+    { href: '/products', label: 'คอลเลกชันประกัน' },
+    { href: '/calculators/tax', label: 'คำนวณภาษี' },
+    { href: '/calculators/life-value', label: 'ประเมินทุนมรดก' },
+    { href: '/quiz', label: 'ค้นหาแผนเฉพาะคุณ' },
+    { href: '/articles', label: 'บทความคัดสรร' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-[#fafafa]/90 backdrop-blur-md border-b border-zinc-200/80">
+    <header className="sticky top-0 z-50 bg-[#fbfaf6]/95 backdrop-blur-md border-b border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* ModtanoyAdvisor Logo - Minimal & Clean */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center shrink-0 transition-transform duration-150 group-hover:scale-105">
-              <Shield className="w-4 h-4 fill-white/20" />
+        <div className="flex justify-between items-center h-20">
+          
+          {/* Brand Identity - Editorial Serif */}
+          <Link href="/" className="flex items-center gap-3.5 group">
+            <div className="w-8 h-8 rounded-none border border-stone-900 bg-stone-900 text-[#c5a059] flex items-center justify-center shrink-0 transition-colors duration-400 group-hover:bg-[#c5a059] group-hover:text-stone-950 group-hover:border-[#c5a059]">
+              <Shield className="w-4 h-4" />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base font-bold tracking-tight text-zinc-900 whitespace-nowrap">
-                Modtanoy<span className="text-zinc-500 font-medium">Advisor</span>
+            <div className="flex items-center gap-2.5">
+              <span className="font-serif text-xl tracking-tight font-medium text-stone-900 whitespace-nowrap">
+                Modtanoy<span className="italic font-serif text-[#c5a059] ml-1">Advisor</span>
               </span>
-              <span className="hidden md:inline-flex items-center text-[11px] font-mono text-zinc-400 border-l border-zinc-200 pl-2.5 whitespace-nowrap uppercase tracking-wider">
-                Financial & Advisory
+              <span className="hidden md:inline-flex items-center text-[10px] uppercase tracking-[0.25em] font-medium text-stone-400 border-l border-stone-300 pl-3 whitespace-nowrap font-mono">
+                Private Advisory
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 text-xs font-medium text-zinc-600">
+          {/* Desktop Navigation Links - High-End Editorial Style */}
+          <nav className="hidden lg:flex items-center gap-7 text-xs uppercase tracking-[0.18em] font-medium text-stone-600">
             {navLinks.map((item) => {
-              const Icon = item.icon;
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors duration-150 whitespace-nowrap ${
+                  className={`py-1 transition-all duration-300 relative ${
                     isActive
-                      ? 'bg-zinc-100 text-zinc-900 font-semibold'
-                      : 'hover:text-zinc-900 hover:bg-zinc-100/60'
+                      ? 'text-stone-950 font-semibold'
+                      : 'hover:text-stone-950'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-zinc-900' : 'text-zinc-400'}`} />
                   <span>{item.label}</span>
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#c5a059]" />
+                  )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Consultation CTA Button */}
-          <div className="hidden lg:flex items-center gap-2">
+          {/* Editorial Sharp CTA Button */}
+          <div className="hidden lg:flex items-center gap-3">
             <Link
               href="/consultation"
-              className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg text-xs font-medium bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98] transition duration-150 whitespace-nowrap cursor-pointer focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none"
+              className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-none text-[11px] uppercase tracking-[0.2em] font-medium border border-stone-900 bg-stone-900 text-[#fcfbf7] hover:bg-[#c5a059] hover:border-[#c5a059] hover:text-stone-950 active:scale-[0.99] transition-all duration-300 cursor-pointer"
             >
-              <PhoneCall className="w-3.5 h-3.5 shrink-0" />
-              <span>ปรึกษาตัวแทนฟรี</span>
+              <span>ปรึกษาที่ปรึกษา คปภ.</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
@@ -86,7 +84,7 @@ export function Navbar() {
           <div className="lg:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg text-zinc-700 hover:bg-zinc-100 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none"
+              className="p-2 rounded-none text-stone-800 hover:bg-stone-100 transition-colors duration-200"
               aria-label="Toggle navigation menu"
             >
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -97,34 +95,32 @@ export function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {isOpen && (
-        <div className="lg:hidden bg-[#fafafa]/95 backdrop-blur-md border-b border-zinc-200 px-4 pt-2 pb-5 space-y-1">
+        <div className="lg:hidden bg-[#fbfaf6] border-b border-stone-200 px-6 pt-4 pb-6 space-y-3">
           {navLinks.map((item) => {
-            const Icon = item.icon;
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors duration-150 ${
+                className={`block py-2 text-xs uppercase tracking-[0.18em] transition-colors duration-200 ${
                   isActive
-                    ? 'bg-zinc-100 text-zinc-900 font-semibold'
-                    : 'text-zinc-700 hover:bg-zinc-100/70 hover:text-zinc-900'
+                    ? 'text-stone-950 font-bold border-l-2 border-[#c5a059] pl-3'
+                    : 'text-stone-600 hover:text-stone-950 pl-3'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-zinc-900' : 'text-zinc-400'}`} />
                 <span>{item.label}</span>
               </Link>
             );
           })}
-          <div className="pt-3 border-t border-zinc-200">
+          <div className="pt-3 border-t border-stone-200">
             <Link
               href="/consultation"
               onClick={() => setIsOpen(false)}
-              className="flex items-center justify-center gap-2 w-full h-10 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg active:scale-[0.98] transition duration-150"
+              className="flex items-center justify-center gap-2 w-full h-11 bg-stone-900 hover:bg-[#c5a059] text-white hover:text-stone-950 text-xs uppercase tracking-[0.2em] font-medium rounded-none transition-all duration-300"
             >
-              <PhoneCall className="w-3.5 h-3.5" />
-              <span>ปรึกษาตัวแทนมืออาชีพฟรี</span>
+              <span>นัดหมายที่ปรึกษาการเงิน</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>

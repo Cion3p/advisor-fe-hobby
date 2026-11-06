@@ -9,16 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
+        serif: [
+          'var(--font-cormorant)',
+          'var(--font-playfair)',
+          'var(--font-noto-serif-thai)',
+          'Cormorant Garamond',
+          'Playfair Display',
+          'Georgia',
+          'serif',
+        ],
         sans: [
           'var(--font-inter)',
           'var(--font-noto-sans-thai)',
-          'var(--font-plus-jakarta)',
           'Inter',
           '-apple-system',
           'BlinkMacSystemFont',
-          '"Segoe UI"',
-          'Roboto',
-          'system-ui',
           'sans-serif',
         ],
         mono: [
@@ -26,52 +31,57 @@ const config: Config = {
           'JetBrains Mono',
           'Geist Mono',
           'ui-monospace',
-          'SFMono-Regular',
-          'Menlo',
-          'Monaco',
-          'Consolas',
           'monospace',
         ],
       },
       colors: {
-        // High-contrast clean accent
-        accent: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
+        // Luxury Palette from taste_v2.md
+        obsidian: {
+          950: '#0c0b0a',
+          900: '#121110',
+          800: '#171615',
+          700: '#23211f',
         },
-        surface: {
-          base: '#fafafa',
-          card: '#ffffff',
-          dark: '#09090b',
-          'dark-card': '#18181b',
-          'dark-subtle': '#27272a',
+        ivory: {
+          50: '#fcfbf7',
+          100: '#f5f4ef',
+          200: '#eceae3',
+          300: '#dedad0',
         },
-        // Preserve brand aliases for compatibility with legacy class names, remapped to clean minimal tones
+        gold: {
+          50: '#faf7ed',
+          100: '#f4ebd2',
+          200: '#ead7a5',
+          300: '#dfc278',
+          400: '#d4af37',
+          500: '#c5a059',
+          600: '#a88241',
+          700: '#876532',
+        },
+        bronze: {
+          500: '#8c6d46',
+          600: '#735735',
+        },
+        // Brand & Stone backward compatibility
         brand: {
-          50: '#fafafa',
-          100: '#f4f4f5',
-          200: '#e4e4e7',
-          300: '#d4d4d8',
-          400: '#a1a1aa',
-          500: '#71717a',
-          600: '#18181b',
-          700: '#09090b',
-          800: '#09090b',
-          900: '#09090b',
-          950: '#09090b',
+          50: '#fcfbf7',
+          100: '#f5f4ef',
+          200: '#eceae3',
+          300: '#dedad0',
+          400: '#c5a059',
+          500: '#a88241',
+          600: '#171615',
+          700: '#121110',
+          800: '#0c0b0a',
+          900: '#0c0b0a',
         },
       },
-      boxShadow: {
-        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-        'subtle-hover': '0 2px 8px 0 rgba(0, 0, 0, 0.06)',
+      letterSpacing: {
+        'luxury': '0.25em',
+        'subtle-wide': '0.15em',
       },
-      borderRadius: {
-        'xl': '0.75rem',
-        '2xl': '1rem',
+      transitionTimingFunction: {
+        'cinematic': 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
     },
   },

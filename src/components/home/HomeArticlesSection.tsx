@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, ArrowRight, Clock, User } from 'lucide-react';
+import { ArrowRight, Clock, User } from 'lucide-react';
 import { Article } from '@/types';
 import { getArticles } from '@/lib/api';
 
@@ -41,99 +41,98 @@ export function HomeArticlesSection({ initialArticles }: HomeArticlesSectionProp
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+      {/* Section Header - Editorial Magazine Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 border-b border-stone-200/80 pb-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-medium text-zinc-700 font-mono mb-2">
-            <BookOpen className="w-3 h-3 text-zinc-500" />
-            <span>KNOWLEDGE HUB</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">
-            บทความและคู่มือวางแผนประกันภัย 2567
+          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] font-medium text-stone-500 font-mono block mb-2">
+            ESSAYS & EDITORIAL INSIGHTS
+          </span>
+          <h2 className="font-serif text-3xl sm:text-4xl font-normal text-stone-950 tracking-tight">
+            บทความคัดสรรและคู่มือวางแผนมรดก 2567
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-stone-500 mt-2 max-w-xl font-light leading-relaxed">
             เกร็ดความรู้ภาษี เงื่อนไขประกันสุขภาพเหมาจ่าย และเทคนิคการส่งต่อมรดก เขียนโดยทีมที่ปรึกษาการเงินมืออาชีพ
           </p>
         </div>
 
         <Link
           href="/articles"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-700 hover:text-zinc-900 bg-white border border-zinc-200 hover:border-zinc-300 px-3.5 py-2 rounded-lg transition-colors duration-150 cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] font-medium text-stone-900 hover:text-[#a88241] group transition-colors duration-300 pb-1"
         >
-          <span>ดูบทความทั้งหมด ({articles.length})</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          <span>บทความทั้งหมด ({articles.length})</span>
+          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform duration-300" />
         </Link>
       </div>
 
-      {/* Grid of Articles */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Grid of Articles - Gallery Framing */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {featured.map((article) => (
           <article
             key={article.id}
-            className="bg-white rounded-xl border border-zinc-200 hover:border-zinc-300 p-5 transition-colors duration-150 flex flex-col justify-between group overflow-hidden"
+            className="bg-white rounded-none border border-stone-200 hover:border-[#c5a059] p-6 transition-all duration-500 flex flex-col justify-between group"
           >
             <div>
-              {/* Cover Image Thumbnail */}
+              {/* Cover Image Thumbnail with Aspect Ratio */}
               {article.cover_image_url && (
-                <div className="relative h-44 sm:h-48 w-full rounded-lg overflow-hidden mb-4 bg-zinc-100 border border-zinc-200/60">
+                <div className="relative aspect-[16/10] w-full rounded-none overflow-hidden mb-5 bg-stone-100 border border-stone-200/60">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={article.cover_image_url}
                     alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 via-transparent to-transparent"></div>
+                  <div className="absolute inset-0 bg-stone-950/20 group-hover:opacity-0 transition-opacity duration-500"></div>
                   
-                  {/* Category Pill */}
+                  {/* Category Eyebrow */}
                   <div className="absolute top-3 left-3">
-                    <span className="text-[11px] font-medium font-mono px-2 py-0.5 rounded bg-white/95 text-zinc-800 border border-zinc-200/80">
-                      {article.category_name || 'ความรู้การเงิน'}
+                    <span className="text-[9px] uppercase tracking-[0.2em] font-mono px-2.5 py-1 bg-white/95 text-stone-900 border border-stone-200">
+                      {article.category_name || 'FINANCE'}
                     </span>
                   </div>
 
                   {/* Reading Time */}
-                  <div className="absolute bottom-2.5 right-3 flex items-center gap-1 text-[11px] text-zinc-200 font-mono bg-black/60 px-2 py-0.5 rounded">
-                    <Clock className="w-3 h-3 text-zinc-400" />
+                  <div className="absolute bottom-2.5 right-3 flex items-center gap-1 text-[10px] font-mono text-stone-200 bg-stone-950/70 px-2 py-0.5">
+                    <Clock className="w-3 h-3 text-[#c5a059]" />
                     <span>{article.reading_time_minutes} นาที</span>
                   </div>
                 </div>
               )}
 
-              {/* Text Meta Header (if no image) */}
+              {/* Text Header (if no image) */}
               {!article.cover_image_url && (
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="text-[11px] font-medium font-mono px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200">
-                    {article.category_name || 'ความรู้การเงิน'}
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <span className="text-[10px] uppercase tracking-[0.2em] font-mono px-2 py-0.5 border border-stone-200 text-stone-600">
+                    {article.category_name || 'FINANCE'}
                   </span>
-                  <div className="flex items-center gap-1 text-[11px] font-mono text-zinc-400">
-                    <Clock className="w-3 h-3 text-zinc-400" />
+                  <div className="flex items-center gap-1 text-[11px] font-mono text-stone-400">
+                    <Clock className="w-3 h-3 text-stone-400" />
                     <span>{article.reading_time_minutes} นาที</span>
                   </div>
                 </div>
               )}
 
               {/* Title */}
-              <h3 className="text-base font-bold text-zinc-900 group-hover:text-zinc-700 transition-colors duration-150 leading-snug line-clamp-2">
+              <h3 className="font-serif text-lg font-normal text-stone-950 group-hover:text-[#a88241] transition-colors duration-300 leading-snug line-clamp-2">
                 <Link href={`/articles/${article.slug}`}>
                   {article.title}
                 </Link>
               </h3>
 
               {/* Excerpt */}
-              <p className="text-xs text-zinc-500 leading-relaxed line-clamp-3 mt-2">
+              <p className="text-xs text-stone-500 leading-loose line-clamp-3 mt-2.5 font-light">
                 {article.excerpt}
               </p>
             </div>
 
             {/* Author Footer */}
-            <div className="pt-4 mt-4 border-t border-zinc-100 flex items-center justify-between text-xs">
+            <div className="pt-5 mt-5 border-t border-stone-100 flex items-center justify-between text-xs">
               <div className="space-y-0.5">
-                <div className="font-medium text-zinc-700 flex items-center gap-1 text-xs">
-                  <User className="w-3 h-3 text-zinc-400" />
+                <div className="text-stone-800 flex items-center gap-1.5 text-xs font-medium">
+                  <User className="w-3 h-3 text-[#c5a059]" />
                   <span>{article.author_name}</span>
                 </div>
                 {article.author_license && (
-                  <div className="text-[10px] font-mono text-zinc-400">
+                  <div className="text-[10px] font-mono text-stone-400">
                     {article.author_license}
                   </div>
                 )}
@@ -141,10 +140,10 @@ export function HomeArticlesSection({ initialArticles }: HomeArticlesSectionProp
 
               <Link
                 href={`/articles/${article.slug}`}
-                className="inline-flex items-center gap-1 text-xs font-medium text-zinc-900 hover:text-zinc-600 group-hover:translate-x-0.5 transition-all duration-150"
+                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] font-medium text-stone-900 group-hover:text-[#a88241] transition-colors duration-300"
               >
                 <span>อ่านต่อ</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" />
               </Link>
             </div>
           </article>

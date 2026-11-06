@@ -56,18 +56,18 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       {/* Header Banner */}
-      <div className="bg-white rounded-xl p-5 sm:p-6 border border-zinc-200 space-y-5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200 uppercase tracking-wider">
-                CATALOG
+      <div className="bg-white/80 backdrop-blur-xs rounded-none p-6 sm:p-10 border border-stone-200/80 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-stone-200/70 pb-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[10px] font-mono tracking-[0.25em] px-2.5 py-0.5 rounded-none bg-stone-100 text-[#8c6d46] border border-stone-300 uppercase">
+                CURATED PORTFOLIO
               </span>
               {activeCompany && (
                 <span
-                  className="text-xs font-mono font-bold px-2 py-0.5 rounded border"
+                  className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-none border tracking-wider"
                   style={{
                     backgroundColor: activeCompany.lightBg,
                     borderColor: activeCompany.borderColor,
@@ -78,63 +78,63 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 </span>
               )}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-stone-900 tracking-tight leading-tight">
               {activeCategory
                 ? activeCategory.name_th
                 : activeCompany
                 ? `แผนประกันภัยของ ${activeCompany.name}`
-                : 'แผนประกันและผลิตภัณฑ์การเงินทั้งหมด'}
+                : 'แผนประกันและการเงินคัดสรร'}
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-500 mt-1">
+            <p className="text-xs sm:text-sm text-stone-600 max-w-2xl font-light leading-relaxed">
               {activeCategory
                 ? activeCategory.description
                 : activeCompany
-                ? `รวมแผนประกันชีวิตและสุขภาพจาก ${activeCompany.fullName}`
-                : `พบทั้งหมด ${products.length} แผนประกัน พร้อมตารางผลประโยชน์โปร่งใส`}
+                ? `รวมแผนประกันชีวิตและสุขภาพมาตรฐานสากลจาก ${activeCompany.fullName}`
+                : `พบทั้งหมด ${products.length} แผนประกัน พร้อมตารางผลประโยชน์โปร่งใสและคำนวณเบี้ยตรงไปตรงมา`}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0">
             <Link
               href="/calculators/tax"
-              className="h-9 px-3.5 rounded-lg text-xs font-medium border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 flex items-center transition-colors duration-150"
+              className="h-10 px-4 rounded-none text-xs font-mono uppercase tracking-wider border border-stone-300 bg-white hover:bg-stone-50 hover:border-stone-900 text-stone-800 flex items-center transition-colors duration-200"
             >
               คำนวณลดหย่อนภาษี
             </Link>
             <Link
               href="/quiz"
-              className="h-9 px-3.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-white flex items-center transition-colors duration-150 active:scale-[0.98]"
+              className="h-10 px-4 rounded-none text-xs font-mono uppercase tracking-wider bg-[#0c0b0a] hover:bg-stone-900 text-stone-100 flex items-center transition-colors duration-200 border border-stone-800"
             >
-              แบบทดสอบค้นหาแผน
+              ค้นหาแผนที่ใช่
             </Link>
           </div>
         </div>
 
-        {/* 1. Category Filter Pills */}
-        <div className="pt-4 border-t border-zinc-100 space-y-2">
+        {/* 1. Category Filter Tabs */}
+        <div className="space-y-2.5">
           <div className="flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-            <span className="text-xs font-mono uppercase tracking-wider text-zinc-500">หมวดหมู่ความคุ้มครอง:</span>
+            <Layers className="w-3.5 h-3.5 text-[#c5a059] shrink-0" />
+            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-stone-500">หมวดหมู่ความคุ้มครอง:</span>
           </div>
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
             <Link
               href={buildFilterUrl({ category: null })}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors duration-150 border ${
+              className={`px-3.5 py-1.5 rounded-none text-xs font-mono tracking-wider whitespace-nowrap transition-all duration-200 border ${
                 !categorySlug
-                  ? 'bg-zinc-900 text-white border-zinc-900'
-                  : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50'
+                  ? 'bg-[#0c0b0a] text-stone-100 border-[#0c0b0a]'
+                  : 'bg-white text-stone-700 border-stone-200 hover:border-stone-400 hover:bg-stone-50'
               }`}
             >
-              ทุกหมวดหมู่
+              ALL CATEGORIES
             </Link>
             {categories.map((c) => (
               <Link
                 key={c.id}
                 href={buildFilterUrl({ category: c.slug })}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors duration-150 border ${
+                className={`px-3.5 py-1.5 rounded-none text-xs font-mono tracking-wider whitespace-nowrap transition-all duration-200 border ${
                   categorySlug === c.slug
-                    ? 'bg-zinc-900 text-white border-zinc-900'
-                    : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50'
+                    ? 'bg-[#0c0b0a] text-stone-100 border-[#0c0b0a]'
+                    : 'bg-white text-stone-700 border-stone-200 hover:border-stone-400 hover:bg-stone-50'
                 }`}
               >
                 {c.name_th}
@@ -143,19 +143,19 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           </div>
         </div>
 
-        {/* 2. Insurer Partner Company Brand Filter Pills */}
-        <div className="pt-3 border-t border-zinc-100 space-y-2">
+        {/* 2. Insurer Partner Company Brand Filter */}
+        <div className="pt-3 border-t border-stone-200/60 space-y-2.5">
           <div className="flex items-center gap-1.5">
-            <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-            <span className="text-xs font-mono uppercase tracking-wider text-zinc-500">บริษัทผู้รับประกัน:</span>
+            <Building2 className="w-3.5 h-3.5 text-[#c5a059] shrink-0" />
+            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-stone-500">พันธมิตรผู้รับประกัน:</span>
           </div>
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
             <Link
               href={buildFilterUrl({ company: null })}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium font-mono whitespace-nowrap transition-colors duration-150 border ${
+              className={`px-3 py-1.5 rounded-none text-xs font-mono tracking-wider whitespace-nowrap transition-all duration-200 border ${
                 !companyCode
-                  ? 'bg-zinc-900 text-white border-zinc-900'
-                  : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50'
+                  ? 'bg-[#0c0b0a] text-stone-100 border-[#0c0b0a]'
+                  : 'bg-white text-stone-700 border-stone-200 hover:border-stone-400 hover:bg-stone-50'
               }`}
             >
               ALL
@@ -166,14 +166,14 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 <Link
                   key={brand.code}
                   href={buildFilterUrl({ company: brand.code })}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium whitespace-nowrap transition-all duration-150 border ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none text-xs font-mono font-medium tracking-wider whitespace-nowrap transition-all duration-200 border ${
                     isSelected
-                      ? 'bg-zinc-900 text-white border-zinc-900'
-                      : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50'
+                      ? 'bg-[#0c0b0a] text-stone-100 border-[#0c0b0a]'
+                      : 'bg-white text-stone-700 border-stone-200 hover:border-stone-400 hover:bg-stone-50'
                   }`}
                 >
                   <span
-                    className="w-1.5 h-1.5 rounded-full shrink-0"
+                    className="w-1.5 h-1.5 rounded-none shrink-0"
                     style={{ backgroundColor: brand.brandColor }}
                   />
                   <span>{brand.code}</span>
@@ -186,22 +186,22 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
       {/* Products Grid */}
       {products.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 bg-white rounded-xl border border-zinc-200 p-8 space-y-3">
-          <ShieldCheck className="w-10 h-10 text-zinc-300 mx-auto" />
-          <h3 className="text-base font-bold text-zinc-800">ไม่พบแผนประกันที่ตรงกับเงื่อนไข</h3>
-          <p className="text-xs text-zinc-500">
-            ลองปรับเปลี่ยนคำค้นหา หรือคลิกปุ่ม &quot;ล้างตัวกรองทั้งหมด&quot; เพื่อดูผลิตภัณฑ์ทั้งหมด
+        <div className="text-center py-20 bg-white rounded-none border border-stone-200 p-8 space-y-4">
+          <ShieldCheck className="w-12 h-12 text-stone-300 mx-auto" />
+          <h3 className="text-lg font-serif font-bold text-stone-800">ไม่พบแผนประกันที่ตรงกับเงื่อนไข</h3>
+          <p className="text-xs text-stone-500 max-w-md mx-auto">
+            ลองปรับเปลี่ยนคำค้นหา หรือคลิกปุ่ม &quot;ล้างตัวกรองทั้งหมด&quot; เพื่อชมผลิตภัณฑ์ทั้งหมดในพอร์ตโฟลิโอ
           </p>
           <div className="pt-2">
             <Link
               href="/products"
-              className="inline-flex items-center justify-center h-9 px-4 rounded-lg bg-zinc-900 text-white text-xs font-medium hover:bg-zinc-800 active:scale-[0.98] transition duration-150"
+              className="inline-flex items-center justify-center h-10 px-6 rounded-none bg-[#0c0b0a] text-stone-100 text-xs font-mono uppercase tracking-wider hover:bg-stone-900 border border-stone-800 transition duration-200"
             >
               ล้างตัวกรองทั้งหมด
             </Link>

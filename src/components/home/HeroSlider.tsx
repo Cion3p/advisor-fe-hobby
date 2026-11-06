@@ -12,11 +12,10 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  Award,
   PhoneCall,
   Play,
   Pause,
-  Star
+  Award
 } from 'lucide-react';
 import { HeroSlide } from '@/types';
 import { getHeroSlides, FALLBACK_HERO_SLIDES } from '@/lib/api';
@@ -29,7 +28,6 @@ export function HeroSlider() {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Sync slides with localStorage & custom update events from Admin Portal
   useEffect(() => {
     const loaded = getHeroSlides().filter((s) => s.is_active);
     if (loaded.length > 0) {
@@ -55,27 +53,27 @@ export function HeroSlider() {
     };
   }, []);
 
-  const AUTO_PLAY_INTERVAL = 6500;
+  const AUTO_PLAY_INTERVAL = 7000;
 
   const nextSlide = useCallback(() => {
     if (isTransitioning || slides.length <= 1) return;
     setIsTransitioning(true);
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-    setTimeout(() => setIsTransitioning(false), 300);
+    setTimeout(() => setIsTransitioning(false), 500);
   }, [isTransitioning, slides.length]);
 
   const prevSlide = useCallback(() => {
     if (isTransitioning || slides.length <= 1) return;
     setIsTransitioning(true);
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-    setTimeout(() => setIsTransitioning(false), 300);
+    setTimeout(() => setIsTransitioning(false), 500);
   }, [isTransitioning, slides.length]);
 
   const goToSlide = (index: number) => {
     if (index === currentSlide || isTransitioning) return;
     setIsTransitioning(true);
     setCurrentSlide(index);
-    setTimeout(() => setIsTransitioning(false), 300);
+    setTimeout(() => setIsTransitioning(false), 500);
   };
 
   useEffect(() => {
@@ -113,168 +111,168 @@ export function HeroSlider() {
   const renderBadgeIcon = (iconName?: string) => {
     switch (iconName) {
       case 'Percent':
-        return <Percent className="w-3.5 h-3.5 text-zinc-700" />;
+        return <Percent className="w-3.5 h-3.5 text-[#c5a059]" />;
       case 'Shield':
-        return <Shield className="w-3.5 h-3.5 text-zinc-700" />;
+        return <Shield className="w-3.5 h-3.5 text-[#c5a059]" />;
       case 'Sparkles':
-        return <Sparkles className="w-3.5 h-3.5 text-zinc-700" />;
+        return <Sparkles className="w-3.5 h-3.5 text-[#c5a059]" />;
       case 'PiggyBank':
-        return <PiggyBank className="w-3.5 h-3.5 text-zinc-700" />;
+        return <PiggyBank className="w-3.5 h-3.5 text-[#c5a059]" />;
       case 'HeartPulse':
       default:
-        return <HeartPulse className="w-3.5 h-3.5 text-zinc-700" />;
+        return <HeartPulse className="w-3.5 h-3.5 text-[#c5a059]" />;
     }
   };
 
   return (
     <section 
-      className="relative overflow-hidden bg-white/50 pt-8 pb-12 sm:pt-12 sm:pb-16 border-b border-zinc-200/80 select-none"
+      className="relative overflow-hidden bg-[#fbfaf6] pt-12 pb-16 sm:pt-16 sm:pb-24 border-b border-stone-200/80 select-none"
       onMouseEnter={() => setIsAutoPlay(false)}
       onMouseLeave={() => setIsAutoPlay(true)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Dynamic Slide Background Image with Restrained Neutral Overlay */}
+      {/* Dynamic Slide Background with Atmospheric Depth */}
       {slide.background_image && (
         <div 
           key={slide.id + (slide.background_image || '')}
-          className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out opacity-10 pointer-events-none"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out opacity-15 pointer-events-none"
           style={{ backgroundImage: `url(${slide.background_image})` }}
         >
-          <div className="absolute inset-0 bg-[#fafafa]/90 backdrop-blur-xs"></div>
+          <div className="absolute inset-0 bg-[#fbfaf6]/85 backdrop-blur-xs"></div>
         </div>
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Slide Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center min-h-[420px]">
+        {/* Slide Content Grid - Deliberate Editorial Asymmetry */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center min-h-[460px]">
           
-          {/* Left Column: Text & Actions (7 cols) */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* Left Column: Text & Editorial CTAs (7 cols) */}
+          <div className="lg:col-span-7 space-y-7">
             
-            {/* Top Brand Pill & Dynamic Slide Badge */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-2 bg-zinc-100 text-zinc-800 text-xs font-medium px-2.5 py-1 rounded-full border border-zinc-200/80 font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-zinc-900"></span>
-                <span>ModtanoyAdvisor</span>
-              </div>
-
-              <div className="inline-flex items-center gap-1.5 bg-white text-zinc-700 text-xs font-medium px-2.5 py-1 rounded-full border border-zinc-200">
+            {/* Eyebrow Header */}
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] font-medium text-stone-500 font-mono">
+                SERIES {(currentSlide + 1).toString().padStart(2, '0')} • ARCHITECTURAL PROTECTION
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#c5a059]"></span>
+              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-medium text-stone-600 font-mono flex items-center gap-1.5">
                 {renderBadgeIcon(slide.badge_icon)}
                 <span>{slide.badge_text}</span>
-              </div>
+              </span>
             </div>
 
-            {/* Dynamic Headline */}
-            <div className="space-y-2">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-900 tracking-tight leading-tight">
+            {/* Display Typography */}
+            <div className="space-y-3">
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-normal text-stone-950 tracking-tight leading-[1.12]">
                 {slide.title} <br />
-                <span className="text-zinc-600 font-bold">
+                <span className="italic font-serif text-[#b38f46] font-normal">
                   {slide.title_highlight}
                 </span>
               </h1>
-              <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal pt-1 line-clamp-3 sm:line-clamp-none max-w-2xl">
+              
+              <p className="text-sm sm:text-base text-stone-600 leading-loose max-w-xl font-light pt-2">
                 {slide.subtitle}
               </p>
             </div>
 
-            {/* Benefit Checkmarks */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+            {/* Benefit Points with Hairline Lines */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               {(slide.tags || []).map((tag, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-xs sm:text-[13px] text-zinc-700">
-                  <div className="w-4 h-4 rounded-full bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0 border border-zinc-200">
-                    <CheckCircle className="w-3 h-3" />
-                  </div>
+                <div key={idx} className="flex items-center gap-2.5 text-xs text-stone-700 tracking-wide">
+                  <span className="w-1 h-1 rounded-none bg-[#c5a059] shrink-0" />
                   <span>{tag}</span>
                 </div>
               ))}
             </div>
 
-            {/* Standout Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-              {/* PRIMARY ACTION: High-contrast Dark Engineering Button */}
+            {/* Editorial Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-3">
+              {/* PRIMARY ACTION: High-End Sharp Button */}
               <Link
                 href={slide.primary_btn_href || '/products'}
-                className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-lg text-xs sm:text-sm font-medium bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98] transition duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none"
+                className="inline-flex items-center justify-center gap-3 h-12 px-7 rounded-none text-xs uppercase tracking-[0.2em] font-medium bg-stone-950 text-[#fcfbf7] hover:bg-[#c5a059] hover:text-stone-950 active:scale-[0.99] transition-all duration-400 cursor-pointer"
               >
-                <span>{slide.primary_btn_label || 'ดูรายละเอียด'}</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>{slide.primary_btn_label || 'สำรวจแผนความคุ้มครอง'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
 
-              {/* SECONDARY ACTION: Subtle Surface */}
+              {/* GHOST ACTION: Hairline Border */}
               <Link
                 href={slide.secondary_btn_href || '/consultation'}
-                className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-lg text-xs sm:text-sm font-medium bg-white text-zinc-800 hover:bg-zinc-50 border border-zinc-200 active:scale-[0.98] transition duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none"
+                className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-none text-xs uppercase tracking-[0.2em] font-medium bg-transparent text-stone-900 border border-stone-300 hover:border-stone-950 hover:bg-white active:scale-[0.99] transition-all duration-400 cursor-pointer"
               >
-                <PhoneCall className="w-4 h-4 text-zinc-500" />
-                <span>{slide.secondary_btn_label || 'ปรึกษาตัวแทนฟรี'}</span>
+                <PhoneCall className="w-3.5 h-3.5 text-stone-500" />
+                <span>{slide.secondary_btn_label || 'นัดหมายที่ปรึกษา'}</span>
               </Link>
             </div>
 
           </div>
 
-          {/* Right Column: Clean White Highlight Card (5 cols) */}
+          {/* Right Column: Sharp Framing Showcase Card (5 cols) */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="w-full max-w-md bg-white rounded-xl p-6 sm:p-7 border border-zinc-200 hover:border-zinc-300 transition-colors duration-150">
+            <div className="w-full max-w-md bg-white rounded-none p-7 sm:p-8 border border-stone-200 shadow-none hover:border-[#c5a059] transition-all duration-500 relative">
               
+              {/* Top Accent Line */}
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#c5a059]" />
+
               {/* Card Header */}
-              <div className="flex items-center justify-between gap-2 pb-4 border-b border-zinc-100">
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-zinc-100 text-zinc-800 border border-zinc-200">
-                  <Star className="w-3 h-3 text-zinc-600" />
-                  {slide.card_badge || 'FEATURED'}
+              <div className="flex items-center justify-between pb-5 border-b border-stone-100">
+                <span className="text-[10px] uppercase tracking-[0.25em] font-mono text-[#c5a059] font-semibold">
+                  {slide.card_badge || 'CURATED PORTFOLIO'}
                 </span>
 
-                <span className="text-[11px] font-mono text-zinc-500">
-                  SLIDE {((currentSlide % slides.length) + 1).toString().padStart(2, '0')} / {slides.length.toString().padStart(2, '0')}
+                <span className="text-[10px] font-mono tracking-widest text-stone-400">
+                  {((currentSlide % slides.length) + 1).toString().padStart(2, '0')} / {slides.length.toString().padStart(2, '0')}
                 </span>
               </div>
 
-              {/* Card Main Metric */}
-              <div className="py-5 space-y-1.5">
-                <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 font-mono">
-                  {slide.card_main_title || 'จุดเด่นแผนประกัน'}
+              {/* Main Metric - Serif Headline */}
+              <div className="py-6 space-y-2">
+                <p className="text-[10px] uppercase tracking-[0.25em] font-mono text-stone-400">
+                  {slide.card_main_title || 'จุดเด่นแผนความคุ้มครอง'}
                 </p>
-                <div className="text-3xl sm:text-4xl font-black tracking-tight text-zinc-900 font-mono">
+                <div className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-stone-950">
                   {slide.card_main_metric || 'ความคุ้มครอง'}
                 </div>
-                <p className="text-xs text-zinc-500 font-normal">
+                <p className="text-xs text-stone-500 font-light leading-relaxed">
                   {slide.card_main_metric_sub || ''}
                 </p>
               </div>
 
               {/* Card Stats Grid */}
-              <div className="grid grid-cols-2 gap-3 py-3">
-                <div className="bg-zinc-50 p-3.5 rounded-lg border border-zinc-200/80 space-y-1">
-                  <span className="text-[11px] text-zinc-500 font-medium block">
+              <div className="grid grid-cols-2 gap-3 py-3 border-t border-b border-stone-100">
+                <div className="space-y-1 pr-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 block">
                     {slide.stat1_label || 'จุดเด่น 1'}
                   </span>
-                  <div className="text-base font-bold text-zinc-900 font-mono">
+                  <div className="font-serif text-lg font-medium text-stone-950">
                     {slide.stat1_value || '-'}
                   </div>
-                  <span className="text-[10px] text-zinc-400 block">
+                  <span className="text-[10px] text-stone-400 block font-light">
                     {slide.stat1_desc || ''}
                   </span>
                 </div>
 
-                <div className="bg-zinc-50 p-3.5 rounded-lg border border-zinc-200/80 space-y-1">
-                  <span className="text-[11px] text-zinc-500 font-medium block">
+                <div className="space-y-1 pl-2 border-l border-stone-100">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 block">
                     {slide.stat2_label || 'จุดเด่น 2'}
                   </span>
-                  <div className="text-base font-bold text-zinc-900 font-mono">
+                  <div className="font-serif text-lg font-medium text-stone-950">
                     {slide.stat2_value || '-'}
                   </div>
-                  <span className="text-[10px] text-zinc-400 block">
+                  <span className="text-[10px] text-stone-400 block font-light">
                     {slide.stat2_desc || ''}
                   </span>
                 </div>
               </div>
 
               {/* Card Footer Note */}
-              <div className="pt-4 mt-2 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-600">
-                <span className="font-medium text-[11px] text-zinc-600 flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-zinc-700" />
+              <div className="pt-4 flex items-center justify-between text-[11px] text-stone-500 font-light">
+                <span className="flex items-center gap-1.5 text-stone-600">
+                  <CheckCircle className="w-3.5 h-3.5 text-[#c5a059]" />
                   <span>{(slide.card_footer_note || 'ได้รับความยินยอมและการรับรองจาก คปภ.').replace(/^✓\s*/, '')}</span>
                 </span>
               </div>
@@ -284,8 +282,8 @@ export function HeroSlider() {
 
         </div>
 
-        {/* Carousel Bottom Control Bar */}
-        <div className="mt-8 pt-5 border-t border-zinc-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Carousel Bottom Control Bar - Hairline Framing */}
+        <div className="mt-12 pt-6 border-t border-stone-200/80 flex flex-col sm:flex-row items-center justify-between gap-5">
           
           {/* Slide Indicators / Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 sm:pb-0">
@@ -295,15 +293,15 @@ export function HeroSlider() {
                 <button
                   key={s.id || index}
                   onClick={() => goToSlide(index)}
-                  className={`group flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150 cursor-pointer ${
+                  className={`group flex items-center gap-2 px-3.5 py-2 rounded-none text-[11px] uppercase tracking-[0.15em] transition-all duration-300 cursor-pointer border ${
                     isActive
-                      ? 'bg-zinc-900 text-white'
-                      : 'bg-white hover:bg-zinc-100 text-zinc-600 border border-zinc-200'
+                      ? 'border-stone-900 bg-stone-900 text-[#fcfbf7]'
+                      : 'border-stone-200 bg-white text-stone-600 hover:border-stone-400'
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-zinc-300 group-hover:bg-zinc-400'}`}></span>
-                  <span className="whitespace-nowrap max-w-[130px] truncate font-mono">
+                  <span className={`w-1 h-1 ${isActive ? 'bg-[#c5a059]' : 'bg-stone-300'}`}></span>
+                  <span className="whitespace-nowrap max-w-[140px] truncate font-serif">
                     {s.title}
                   </span>
                 </button>
@@ -311,32 +309,32 @@ export function HeroSlider() {
             })}
           </div>
 
-          {/* Navigation Controls: Prev, Play/Pause, Next */}
-          <div className="flex items-center gap-1.5">
+          {/* Navigation Controls */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setIsAutoPlay(!isAutoPlay)}
-              className="w-8 h-8 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 flex items-center justify-center transition-colors duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-zinc-400"
-              title={isAutoPlay ? 'พักการสไลด์อัตโนมัติ' : 'เล่นการสไลด์อัตโนมัติ'}
-              aria-label={isAutoPlay ? 'Pause autoplay' : 'Resume autoplay'}
+              className="w-9 h-9 rounded-none border border-stone-200 bg-white hover:border-stone-400 text-stone-700 flex items-center justify-center transition-colors duration-300 cursor-pointer"
+              title={isAutoPlay ? 'พักการแสดง' : 'เล่นอัตโนมัติ'}
+              aria-label={isAutoPlay ? 'Pause' : 'Resume'}
             >
               {isAutoPlay ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
             </button>
 
             <button
               onClick={prevSlide}
-              className="w-8 h-8 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 flex items-center justify-center transition-colors duration-150 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-zinc-400"
+              className="w-9 h-9 rounded-none border border-stone-200 bg-white hover:border-stone-400 text-stone-700 flex items-center justify-center transition-colors duration-300 cursor-pointer"
               aria-label="Previous slide"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
 
-            <span className="text-xs font-mono text-zinc-600 px-2 select-none">
-              <span className="font-bold text-zinc-900">{((currentSlide % slides.length) + 1).toString().padStart(2, '0')}</span> / {slides.length.toString().padStart(2, '0')}
+            <span className="text-xs font-mono text-stone-500 px-3 tracking-widest select-none">
+              <span className="text-stone-900 font-bold">{((currentSlide % slides.length) + 1).toString().padStart(2, '0')}</span> / {slides.length.toString().padStart(2, '0')}
             </span>
 
             <button
               onClick={nextSlide}
-              className="w-8 h-8 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 flex items-center justify-center transition-colors duration-150 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-zinc-400"
+              className="w-9 h-9 rounded-none border border-stone-200 bg-white hover:border-stone-400 text-stone-700 flex items-center justify-center transition-colors duration-300 cursor-pointer"
               aria-label="Next slide"
             >
               <ChevronRight className="w-4 h-4" />
@@ -346,18 +344,18 @@ export function HeroSlider() {
         </div>
 
         {/* Trust Badges Footer Strip */}
-        <div className="mt-5 pt-4 border-t border-zinc-200/60 flex flex-wrap items-center justify-center sm:justify-between gap-4 text-xs text-zinc-500">
-          <div className="flex items-center gap-1.5">
-            <CheckCircle className="w-3.5 h-3.5 text-zinc-600" />
-            <span>เปรียบเทียบข้อมูลผลประโยชน์โปร่งใส เป็นกลาง</span>
+        <div className="mt-6 pt-5 border-t border-stone-200/50 flex flex-wrap items-center justify-center sm:justify-between gap-6 text-[11px] uppercase tracking-[0.18em] font-mono text-stone-400">
+          <div className="flex items-center gap-2">
+            <span className="w-1 h-1 bg-[#c5a059]"></span>
+            <span>TRANSPARENT ADVISORY</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <Award className="w-3.5 h-3.5 text-zinc-600" />
-            <span>ที่ปรึกษาการเงินได้รับใบอนุญาต คปภ. ถูกต้อง</span>
+          <div className="flex items-center gap-2">
+            <span className="w-1 h-1 bg-[#c5a059]"></span>
+            <span>OIC LICENSED PARTNERS</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-zinc-600" />
-            <span>รักษาความปลอดภัยข้อมูลตามมาตรฐาน PDPA</span>
+          <div className="flex items-center gap-2">
+            <span className="w-1 h-1 bg-[#c5a059]"></span>
+            <span>PDPA 100% COMPLIANT</span>
           </div>
         </div>
 
