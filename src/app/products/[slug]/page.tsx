@@ -11,10 +11,9 @@ import {
   PhoneCall, 
   ArrowLeft,
   Info,
-  Layers,
-  Clock
+  Layers
 } from 'lucide-react';
-import { fetchProductBySlug, FALLBACK_PRODUCTS } from '@/lib/api';
+import { fetchProductBySlug } from '@/lib/api';
 import { ProductJsonLd, FAQJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import { CompanyBrandBadge } from '@/components/common/CompanyBrandBadge';
 
@@ -33,7 +32,7 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   }
 
   return {
-    title: `${product.title} - เบี้ยประกันและตารางผลประโยชน์ | FinAdvisor TH`,
+    title: `${product.title} - เบี้ยประกันและตารางผลประโยชน์ | ModtanoyAdvisor`,
     description: product.summary,
     keywords: [
       product.title,
@@ -44,7 +43,7 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
       'เบี้ยประกัน',
     ],
     openGraph: {
-      title: `${product.title} | FinAdvisor TH`,
+      title: `${product.title} | ModtanoyAdvisor`,
       description: product.summary,
     },
   };
@@ -84,12 +83,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* 1. Structured Data for Google SEO */}
       <ProductJsonLd
         name={product.title}
         description={product.summary}
-        brand={product.company_name || 'FinAdvisor Partner'}
+        brand={product.company_name || 'ModtanoyAdvisor Partner'}
         category={product.category_name || 'Insurance'}
         minPrice={Number(product.min_premium)}
         rating={product.rating}
@@ -105,24 +104,24 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       />
 
       {/* Back Button & Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-        <Link href="/products" className="inline-flex items-center gap-1 hover:text-brand-600 transition-colors">
+      <nav className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
+        <Link href="/products" className="inline-flex items-center gap-1 hover:text-zinc-900 transition-colors duration-150">
           <ArrowLeft className="w-3.5 h-3.5" /> แผนประกันทั้งหมด
         </Link>
         <span>/</span>
-        <span className="text-slate-400">{product.category_name}</span>
+        <span className="text-zinc-400">{product.category_name}</span>
         <span>/</span>
-        <span className="text-slate-700 font-semibold truncate max-w-xs">{product.title}</span>
+        <span className="text-zinc-800 font-bold truncate max-w-xs">{product.title}</span>
       </nav>
 
       {/* Main Grid: Detail + Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Left Column: Product Information (2 cols) */}
-        <div className="lg:col-span-2 space-y-10">
+        <div className="lg:col-span-2 space-y-8">
           {/* Header Card */}
-          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
+          <div className="bg-white rounded-xl p-6 sm:p-8 border border-zinc-200 space-y-5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-brand-50 text-brand-700 border border-brand-200">
+              <span className="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200">
                 {product.category_name}
               </span>
               <CompanyBrandBadge
@@ -131,34 +130,34 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 variant="compact"
               />
               {product.is_tax_deductible && (
-                <span className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  <Receipt className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1 text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200">
+                  <Receipt className="w-3.5 h-3.5 text-zinc-500" />
                   ลดหย่อนภาษีได้สูงสุด ฿{Number(product.max_tax_deduction).toLocaleString()}
                 </span>
               )}
             </div>
 
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zinc-900 tracking-tight leading-tight">
               {product.title}
             </h1>
 
-            <p className="text-base text-slate-600 leading-relaxed">
+            <p className="text-sm text-zinc-600 leading-relaxed font-normal">
               {product.summary}
             </p>
 
             {/* E-E-A-T Badges */}
-            <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-xs text-slate-500 font-medium">
+            <div className="pt-4 border-t border-zinc-100 flex flex-wrap gap-4 text-xs font-mono text-zinc-500">
               <div className="flex items-center gap-1.5">
-                <Award className="w-4 h-4 text-brand-600" />
-                ผู้ให้บริการ: {product.company_name}
+                <Award className="w-3.5 h-3.5 text-zinc-600" />
+                <span>ผู้ให้บริการ: {product.company_name}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-slate-400" />
-                อัปเดตข้อมูลเงื่อนไขปี 2567
+                <Calendar className="w-3.5 h-3.5 text-zinc-400" />
+                <span>อัปเดตปี 2567</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-wealth-600" />
-                ตรวจสอบโดยที่ปรึกษา คปภ.
+                <ShieldCheck className="w-3.5 h-3.5 text-zinc-700" />
+                <span>ตรวจสอบโดยที่ปรึกษา คปภ.</span>
               </div>
             </div>
           </div>
@@ -171,15 +170,15 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           />
 
           {/* Highlights */}
-          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-4">
-            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-wealth-600" />
+          <div className="bg-white rounded-xl p-6 sm:p-8 border border-zinc-200 space-y-4">
+            <h2 className="text-base font-bold text-zinc-900 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-zinc-700" />
               จุดเด่นและความคุ้มครองหลัก
             </h2>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
               {highlights.map((item: string, idx: number) => (
-                <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-                  <CheckCircle2 className="w-4 h-4 text-wealth-600 flex-shrink-0 mt-0.5" />
+                <li key={idx} className="flex items-start gap-2 text-xs text-zinc-700 bg-zinc-50 p-3 rounded-lg border border-zinc-200/80">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-zinc-700 shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -188,28 +187,28 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
           {/* Benefits Table */}
           {product.benefits && product.benefits.length > 0 && (
-            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
+            <div className="bg-white rounded-xl p-6 sm:p-8 border border-zinc-200 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                  <Layers className="w-5 h-5 text-brand-600" />
+                <h2 className="text-base font-bold text-zinc-900 flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-zinc-700" />
                   ตารางผลประโยชน์ความคุ้มครอง
                 </h2>
-                <span className="text-xs text-slate-400">ตามเงื่อนไขกรมธรรม์</span>
+                <span className="text-[11px] font-mono text-zinc-400">ตามเงื่อนไขกรมธรรม์</span>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-slate-700 text-xs uppercase font-semibold border-b border-slate-200">
+              <div className="overflow-x-auto border border-zinc-200 rounded-lg">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-zinc-50 text-zinc-600 font-mono uppercase text-[11px] border-b border-zinc-200">
                     <tr>
-                      <th className="py-3 px-4">รายการผลประโยชน์</th>
-                      <th className="py-3 px-4 text-right">วงเงินความคุ้มครอง</th>
+                      <th className="py-2.5 px-4">รายการผลประโยชน์</th>
+                      <th className="py-2.5 px-4 text-right">วงเงินความคุ้มครอง</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 text-slate-700">
+                  <tbody className="divide-y divide-zinc-100 text-zinc-700">
                     {product.benefits.map((b) => (
-                      <tr key={b.id} className="hover:bg-slate-50/60 transition-colors">
-                        <td className="py-3.5 px-4 font-medium text-slate-900">{b.benefit_title}</td>
-                        <td className="py-3.5 px-4 text-right font-bold text-brand-900">{b.coverage_amount_desc}</td>
+                      <tr key={b.id} className="hover:bg-zinc-50/60 transition-colors duration-150">
+                        <td className="py-3 px-4 font-medium text-zinc-900">{b.benefit_title}</td>
+                        <td className="py-3 px-4 text-right font-mono font-bold text-zinc-900">{b.coverage_amount_desc}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -220,16 +219,16 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
           {/* Plans breakdown if available */}
           {product.plans && product.plans.length > 0 && (
-            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-4">
-              <h2 className="text-xl font-bold text-slate-900">
+            <div className="bg-white rounded-xl p-6 sm:p-8 border border-zinc-200 space-y-4">
+              <h2 className="text-base font-bold text-zinc-900">
                 ตัวเลือกแผนความคุ้มครอง
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {product.plans.map((plan) => (
-                  <div key={plan.id} className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
-                    <h3 className="font-bold text-base text-slate-900">{plan.plan_name}</h3>
-                    <div className="text-xs text-slate-500 space-y-1">
-                      <div>ทุนประกัน: <strong className="text-slate-800 font-semibold">฿{Number(plan.base_sum_assured).toLocaleString()}</strong></div>
+                  <div key={plan.id} className="p-4 rounded-lg border border-zinc-200 bg-zinc-50/60 space-y-2 font-mono">
+                    <h3 className="font-bold text-sm text-zinc-900">{plan.plan_name}</h3>
+                    <div className="text-xs text-zinc-600 space-y-1">
+                      <div>ทุนประกัน: <strong className="text-zinc-900 font-bold">฿{Number(plan.base_sum_assured).toLocaleString()}</strong></div>
                       <div>เบี้ยประมาณการ (ชาย): ฿{Number(plan.base_premium_male).toLocaleString()} / ปี</div>
                       <div>เบี้ยประมาณการ (หญิง): ฿{Number(plan.base_premium_female).toLocaleString()} / ปี</div>
                     </div>
@@ -239,17 +238,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </div>
           )}
 
-          {/* FAQ Accordion (For SEO Rich Snippets) */}
-          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
-            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <Info className="w-5 h-5 text-amber-500" />
+          {/* FAQ Accordion */}
+          <div className="bg-white rounded-xl p-6 sm:p-8 border border-zinc-200 space-y-4">
+            <h2 className="text-base font-bold text-zinc-900 flex items-center gap-2">
+              <Info className="w-4 h-4 text-zinc-600" />
               คำถามที่พบบ่อย (FAQ)
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {faqItems.map((faq, i) => (
-                <div key={i} className="p-4 rounded-xl border border-slate-200 bg-slate-50/40 space-y-1.5">
-                  <h3 className="text-sm font-bold text-slate-900">{faq.question}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">{faq.answer}</p>
+                <div key={i} className="p-4 rounded-lg border border-zinc-200 bg-zinc-50/50 space-y-1">
+                  <h3 className="text-xs font-bold text-zinc-900">{faq.question}</h3>
+                  <p className="text-xs text-zinc-600 leading-relaxed">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -257,62 +256,62 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         </div>
 
         {/* Right Column: Sticky Consultation Box (1 col) */}
-        <div className="lg:col-span-1 lg:sticky lg:top-28 space-y-6">
-          <div className="bg-white rounded-2xl p-6 border-2 border-brand-500/30 shadow-xl space-y-6">
-            <div className="border-b border-slate-100 pb-4">
-              <span className="text-xs text-slate-500 block">เบี้ยประกันเริ่มต้น</span>
+        <div className="lg:col-span-1 lg:sticky lg:top-24 space-y-4">
+          <div className="bg-white rounded-xl p-5 sm:p-6 border border-zinc-200 space-y-5">
+            <div className="border-b border-zinc-100 pb-4">
+              <span className="text-[11px] font-mono text-zinc-400 block uppercase tracking-wider">เบี้ยประกันเริ่มต้น</span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="text-3xl font-extrabold text-brand-900">
+                <span className="text-2xl sm:text-3xl font-bold font-mono text-zinc-900">
                   ฿{Number(product.min_premium).toLocaleString()}
                 </span>
-                <span className="text-xs text-slate-500"> / ปี</span>
+                <span className="text-xs font-mono text-zinc-500"> / ปี</span>
               </div>
-              <span className="text-xs text-emerald-600 font-medium mt-1 block">
+              <span className="text-[11px] text-zinc-500 font-normal mt-1 block">
                 *คำนวณตามเพศและอายุผู้ขอเอาประกัน
               </span>
             </div>
 
-            <div className="space-y-3 text-xs text-slate-600">
-              <div className="flex justify-between py-1 border-b border-slate-100 items-center">
-                <span className="text-slate-500">บริษัทผู้รับประกัน:</span>
+            <div className="space-y-2.5 text-xs text-zinc-600">
+              <div className="flex justify-between py-1 border-b border-zinc-100 items-center">
+                <span className="text-zinc-500">ผู้รับประกัน:</span>
                 <CompanyBrandBadge
                   companyCode={product.company_code}
                   companyName={product.company_name}
                   variant="compact"
                 />
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">อายุรับประกัน:</span>
-                <span className="font-semibold text-slate-900">{product.min_entry_age} - {product.max_entry_age} ปี</span>
+              <div className="flex justify-between py-1 border-b border-zinc-100">
+                <span className="text-zinc-500">อายุรับประกัน:</span>
+                <span className="font-mono font-medium text-zinc-900">{product.min_entry_age} - {product.max_entry_age} ปี</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">ระยะเวลาชำระเบี้ย:</span>
-                <span className="font-semibold text-slate-900">{product.premium_payment_term}</span>
+              <div className="flex justify-between py-1 border-b border-zinc-100">
+                <span className="text-zinc-500">ระยะเวลาชำระเบี้ย:</span>
+                <span className="font-medium text-zinc-900">{product.premium_payment_term}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">ระยะเวลาคุ้มครอง:</span>
-                <span className="font-semibold text-slate-900">{product.coverage_term}</span>
+              <div className="flex justify-between py-1 border-b border-zinc-100">
+                <span className="text-zinc-500">ระยะเวลาคุ้มครอง:</span>
+                <span className="font-medium text-zinc-900">{product.coverage_term}</span>
               </div>
             </div>
 
-            <div className="space-y-2.5 pt-2">
+            <div className="space-y-2 pt-1">
               <Link
                 href={`/consultation?product=${product.id}&title=${encodeURIComponent(product.title)}`}
-                className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-brand-600/25 transition-all text-sm text-center"
+                className="w-full h-10 flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-lg transition-all duration-150 active:scale-[0.98] text-xs text-center"
               >
-                <PhoneCall className="w-4 h-4" />
-                ขอรับคำปรึกษาและคำนวณเบี้ยฟรี
+                <PhoneCall className="w-3.5 h-3.5" />
+                <span>ขอรับคำปรึกษาและคำนวณเบี้ยฟรี</span>
               </Link>
               <Link
                 href="/calculators/tax"
-                className="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 px-4 rounded-xl transition-all text-xs text-center"
+                className="w-full h-9 flex items-center justify-center gap-2 bg-white hover:bg-zinc-50 text-zinc-700 font-medium rounded-lg border border-zinc-200 transition-colors duration-150 text-xs text-center"
               >
                 ทดลองคำนวณลดหย่อนภาษี
               </Link>
             </div>
 
-            <div className="pt-3 text-[11px] text-slate-400 text-center leading-relaxed">
-              🔒 ข้อมูลของคุณปลอดภัยตามมาตรฐาน PDPA ไม่มีการนำเบอร์โทรไปขายต่อ
+            <div className="pt-2 text-[10px] font-mono text-zinc-400 text-center leading-relaxed">
+              🔒 PDPA Verified • ไม่มีข้อผูกมัดใดๆ
             </div>
           </div>
         </div>

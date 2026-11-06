@@ -1,25 +1,10 @@
 import type { Metadata } from 'next';
-import { Noto_Sans_Thai, Plus_Jakarta_Sans } from 'next/font/google';
 import { Suspense } from 'react';
 import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { CookieConsentBanner } from '@/components/common/CookieConsentBanner';
 import { AnalyticsRouteTracker } from '@/components/common/AnalyticsRouteTracker';
-
-const notoSansThai = Noto_Sans_Thai({
-  subsets: ['thai', 'latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-noto-sans-thai',
-  display: 'swap',
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-plus-jakarta',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
@@ -78,14 +63,20 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="th" className={`${notoSansThai.variable} ${plusJakarta.variable}`}>
+    <html lang="th">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>
-      <body className="font-sans flex flex-col min-h-screen bg-slate-50 antialiased text-slate-800 selection:bg-brand-500 selection:text-white">
+      <body className="font-sans flex flex-col min-h-screen bg-[#fafafa] antialiased text-zinc-900 selection:bg-zinc-900 selection:text-white">
         <Suspense fallback={null}>
           <AnalyticsRouteTracker />
         </Suspense>
